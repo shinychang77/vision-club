@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="闔目團契記號">
+  <!-- 一道弧線（闔上的眼），下面六個點（點字的一方） -->
+  <path d="M10 20 Q32 38 54 20" fill="none" stroke="#8a7a5c" stroke-width="3" stroke-linecap="round"/>
+  <g fill="#8a7a5c">
+    <circle cx="27" cy="40" r="2.6"/><circle cx="37" cy="40" r="2.6"/>
+    <circle cx="27" cy="49" r="2.6"/><circle cx="37" cy="49" r="2.6"/>
+    <circle cx="27" cy="58" r="2.6"/><circle cx="37" cy="58" r="2.6"/>
+  </g>
+</svg>

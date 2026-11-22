@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>視界認知小測驗｜視界同好會</title>
+  <meta name="description" content="視界認知小測驗，約 10 分鐘了解自己的注意力、記憶與知覺判斷表現。免註冊，完成後可分享結果！">
+  <link rel="stylesheet" href="site.css">
+  <script src="site.js" defer></script>
+  <script src="content.js" defer></script>
+  <script src="js/progress.js" defer></script>
+  <script src="js/effects.js" defer></script>
+  <script src="js/home.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html">
+        <span class="logo" data-logo role="img" aria-label="視界同好會標誌"></span>
+        <span class="brand-text">
+          <strong>視界同好會</strong>
+          <small>Horizon Cognition Club</small>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="主要導覽">
+        <a href="#about">關於我們</a>
+        <a href="wiki.html">知識庫</a>
+        <a href="profile.html">個人資料</a>
+        <a href="#faq">常見問題</a>
+      </nav>
+      <form class="site-search" id="site-search" role="search">
+        <input type="search" id="site-q" name="q" placeholder="站內搜尋" aria-label="站內搜尋" autocomplete="off">
+        <button type="submit">搜尋</button>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="kicker">視界認知小測驗　第 3 版</p>
+          <h1>你的<em>理智</em>還剩多少？</h1>
+          <p class="lead">透過一些知覺、記憶與注意力的小題目，測出你的理智值，順便鑑定你看世界的方式！</p>
+          <a class="button" href="quiz.html">開始測驗</a>
+          <ul class="facts">
+            <li>約 10 分鐘</li>
+            <li>免註冊</li>
+            <li>完成後可分享結果</li>
+          </ul>
+          <p class="hero-note">歡迎來<strong>論壇</strong>和認知科學的同好們討論！</p>
+        </div>
+
+        <aside class="notice" aria-labelledby="notice-title">
+          <h2 id="notice-title">最新公告</h2>
+          <ol>
+            <li><time datetime="2026-10-28">2026.10.28</time>第 3.2 版題庫調整完成，部分題目措辭已更新</li>
+            <li><time datetime="2026-10-06">2026.10.06</time>修正部分手機瀏覽器版面跑位的問題</li>
+            <li><time datetime="2026-09-15">2026.09.15</time>詞條資料庫新增知覺心理學相關條目</li>
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="types">
+      <div class="wrap">
+        <h2>你是哪一型？</h2>
+        <div class="type-grid" id="type-grid"></div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="about">
+      <div class="wrap">
+        <h2>關於我們</h2>
+        <div class="about-grid">
+          <div class="prose">
+            <p>視界同好會是一群喜歡認知科學的人在 2019 年辦起來的科普社群。我們把課本和論文裡有趣的實驗改寫成每個人都能玩的小測驗，再把相關的知識整理成小百科，有問題也能到論壇上聊聊。</p>
+            <figure class="post-img">
+              <img src="assets/horizon/meetup.jpg" alt="十來個人圍著併起來的桌子，桌上有錯覺圖卡、筆電和零食，有人舉著一張圖卡。" loading="lazy">
+              <figcaption>去年的線下聚會</figcaption>
+            </figure>
+            <p>我們好奇人們在自己的房間、用自己的裝置時，看見和記住了什麼。題目會依照大家的作答和回饋不定期調整；結果只是參考用，實際狀況還是得找專業機構測試喔！</p>
+          </div>
+          <dl class="stats">
+            <div><dt>累計作答次數</dt><dd>148,206</dd></div>
+            <div><dt>成立至今</dt><dd>7 年</dd></div>
+            <div><dt>目前題庫版本</dt><dd>3.2</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>受測須知</h2>
+        <ol class="rules">
+          <li>請在光線充足的環境下作答，並將螢幕亮度調整至舒適的程度</li>
+          <li>平時配戴眼鏡或隱形眼鏡者，請配戴後再開始</li>
+          <li>作答期間請盡量保持專注，避免切換視窗</li>
+          <li>未滿 12 歲者的視覺與認知功能仍在發育，測驗分數僅供參考</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="faq">
+      <div class="wrap narrow">
+        <h2>常見問題</h2>
+        <details>
+          <summary>需要註冊帳號嗎？</summary>
+          <p>打開網頁，填寫暱稱及年齡就可以開始作答</p>
+        </details>
+        <details>
+          <summary>測驗結果可以當作診斷依據嗎？</summary>
+          <p>本測驗僅供自我了解與研究參考，不具醫療診斷效力。如果對自身狀況有疑慮，請洽詢專業醫療人員</p>
+        </details>
+        <details>
+          <summary>為什麼需要填寫年齡？</summary>
+          <p>認知表現與年齡相關，填寫年齡後，系統才能選用對應的參考資料</p>
+        </details>
+        <details>
+          <summary>中途離開的話，進度會消失嗎？</summary>
+          <p>不會，下次用同一個瀏覽器打開時，會從上次的進度繼續</p>
+        </details>
+        <details>
+          <summary>我的作答資料會上傳嗎？</summary>
+          <p>不會，作答進度只保存在你目前使用的瀏覽器中，清除瀏覽資料後就會一併移除。</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="section" id="changelog">
+      <div class="wrap narrow">
+        <h2>版本更新紀錄</h2>
+        <dl class="changelog">
+          <dt>v3.2.1<time datetime="2026-10-28">2026.10.28</time></dt>
+          <dd>調整部分題目措辭；修正結果頁分享圖在深色模式下的顯示問題</dd>
+          <dt>v3.2.0<time datetime="2026-09-15">2026.09.15</time></dt>
+          <dd>詞條資料庫改版，新增站內搜尋功能</dd>
+          <dt>v3.1.4<time datetime="2026-06-02">2026.06.02</time></dt>
+          <dd>更新年齡層參考資料</dd>
+        </dl>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>© 2019–2026 視界同好會</p>
+      <p>聯絡我們：<a href="mailto:service@horizon-cog.UMA">service@horizon-cog.UMA</a></p>
+      <p>本網站內容不具醫療診斷效力<a href="#faq">隱私與資料說明</a></p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="明域視覺科技研究中心標誌">
+  <!-- 2026-11-21 改版：「明」是光、「域」是範圍。圓（視野）裡一條地平線，上面升起一個點。
+       單色，網站用 CSS mask 套上文字顏色（lab/lab.css 的 .lab-name::before） -->
+  <circle cx="24" cy="24" r="20" fill="none" stroke="#3e5e75" stroke-width="3.5"/>
+  <path d="M6 29 H42" stroke="#3e5e75" stroke-width="3.5"/>
+  <circle cx="24" cy="21" r="5" fill="#3e5e75"/>
+</svg>

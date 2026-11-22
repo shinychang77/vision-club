@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>遠端影像系統</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="lab.css">
+  <script src="../site.js" defer></script>
+  <script src="../content.js" defer></script>
+  <script src="../js/progress.js" defer></script>
+  <script src="../js/effects.js" defer></script>
+  <script src="sem-core.js" defer></script>
+  <script src="sem.js" defer></script>
+</head>
+<body class="sem-body">
+  <header class="lab-header">
+    <div class="lab-wrap"><a class="lab-name" id="lab-name" href="index.html"></a><span class="lab-sub" id="sem-title"></span><a class="lab-back" id="sem-staff" href="index.html#staff"></a><a class="lab-back" id="lab-back" href="../index.html"></a></div>
+  </header>
+  <main class="lab-wrap sem-layout">
+    <aside class="sem-notes" id="sem-notes" aria-label="研究筆記"></aside>
+    <section class="sem-screen" aria-label="影像畫面">
+      <div class="sem-view" id="sem-view" tabindex="0" aria-describedby="sem-help">
+        <div class="sem-optics" id="sem-optics"><div class="sem-stage" id="sem-stage"></div></div>
+        <div class="sem-noise"></div>
+        <div class="sem-scan" id="sem-scan"></div>
+      </div>
+      <div class="sem-databar" id="sem-databar"></div>
+    </section>
+    <aside class="sem-panel" id="sem-panel" aria-label="控制面板"></aside>
+  </main>
+  <noscript><p class="lab-wrap">請開啟瀏覽器的 JavaScript 功能後再使用本網站。</p></noscript>
+</body>
+</html>
