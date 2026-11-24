@@ -17,8 +17,8 @@
   const historyList = document.getElementById('wiki-index-list');
 
   // 有 href 的項目不是詞條，是搜尋得到的連結（例如論壇入口）
-  const link = (entry) => el('a', { href: entry.href || '#' + entry.id, text: entry.title });
-  const newTab = (a) => { a.target = '_blank'; a.rel = 'noopener'; return a; };
+  // 找到的連結和資料（搜尋結果、搜尋歷史、詞條清單）一律開新分頁
+  const link = (entry) => el('a', { href: entry.href || '#' + entry.id, target: '_blank', rel: 'noopener', text: entry.title });
 
   // 詞條（知覺、演化這類科普，之後每條都有清晰度滑桿的示意圖）放「知識庫」；新聞和搜得到的連結是主線，放「搜尋歷史」。
   // 搜「新聞」會一次找到三則新聞（它們的 keywords 都有「新聞」）
@@ -55,7 +55,7 @@
     results.replaceChildren(el('div', { class: 'search-results' }, [
       el('p', { class: 'search-title', text: L.format(W.searchResultTitle, { q: query }) }),
       found.length
-        ? el('ul', {}, found.map((entry) => el('li', {}, [newTab(link(entry)), el('small', { text: entry.summary })]))) // 找到的東西開新分頁
+        ? el('ul', {}, found.map((entry) => el('li', {}, [link(entry), el('small', { text: entry.summary })])))
         : el('p', { class: 'muted', text: L.format(W.searchEmpty, { q: query }) })
     ]));
   }

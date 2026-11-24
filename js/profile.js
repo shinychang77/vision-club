@@ -1,4 +1,4 @@
-// 個人資料頁：暱稱、年齡、重新開始（清除全部進度）
+// 個人資料頁：暱稱、年齡
 (function () {
   const C = window.EYE_CONTENT;
   const P = window.EyeProgress;
@@ -15,7 +15,6 @@
   const age = el('input', { type: 'number', id: 'age', name: 'age', min: 0, max: 120, step: 1, required: true, inputmode: 'numeric', 'aria-describedby': 'age-hint' });
   const ageWarn = el('p', { class: 'red-text field-warn', role: 'status' });
   const saveStatus = el('p', { class: 'form-status', role: 'status' });
-  const resetStatus = el('p', { class: 'form-status', role: 'status' });
   const subjectId = el('dd', { 'data-field': 'subjectId' });
   const answered = el('dd', { 'data-field': 'answered' });
 
@@ -62,26 +61,11 @@
     if (window.EyeEffects) window.EyeEffects.refresh(); // 年齡填到幼兒會解鎖一題：按「儲存」後才跳提示
   });
 
-  const resetButton = el('button', { type: 'button', class: 'button button-danger', text: T.resetButton });
-  resetButton.addEventListener('click', () => {
-    if (!window.confirm(T.resetConfirm)) return;
-    P.reset();
-    saveStatus.textContent = '';
-    resetStatus.textContent = T.resetDone;
-    fill();
-  });
-
   app.replaceChildren(
     form,
     el('dl', { class: 'stats profile-stats' }, [
       el('div', {}, [el('dt', { text: T.subjectIdLabel }), subjectId]),
       el('div', {}, [el('dt', { text: T.answeredLabel }), answered])
-    ]),
-    el('section', { class: 'panel reset' }, [
-      el('h2', { text: T.resetTitle }),
-      el('p', { class: 'muted', text: T.resetIntro }),
-      resetButton,
-      resetStatus
     ])
   );
 

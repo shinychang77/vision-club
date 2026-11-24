@@ -1132,12 +1132,7 @@ var EYE_CONTENT = {
     saved: '已儲存。',
     subjectIdLabel: '受測編號',
     subjectIdNone: '尚未產生（開始作答後產生）',
-    answeredLabel: '已作答題數',
-    resetTitle: '重新開始',
-    resetIntro: '清除這個瀏覽器中保存的所有作答紀錄與個人資料，回到第一次造訪的狀態。',
-    resetButton: '重新開始',
-    resetConfirm: '確定要清除所有作答紀錄與個人資料嗎？這個動作無法復原。',
-    resetDone: '已清除所有紀錄。'
+    answeredLabel: '已作答題數'
   },
 
   /* ----------------------------------------------------------
