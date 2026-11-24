@@ -187,38 +187,60 @@
     if (!m && macular) { root.removeEventListener('pointermove', moveMacular); macular = null; }
   }
 
+  // 色覺異常的藍黃放大倍數：教團網站單獨用 colorblindBoostFellowship（暖色頁面放大太多會太黃）
+  function boost() {
+    var fx = root.EYE_CONTENT.effects || {};
+    return doc.body && doc.body.classList.contains('fellowship') && fx.colorblindBoostFellowship ? fx.colorblindBoostFellowship : fx.colorblindBoost;
+  }
+
   // 依目前的進度重新套用一次。剛拿到新效果時呼叫，不用等換頁
   function refresh() {
     if (!root.EyeProgress || !root.EyeProgressLib || !root.EYE_CONTENT) return;
     var p = root.EyeProgress.load();
     // 通關後點了神奇眼藥水：效果全部關掉（效果本身的解鎖紀錄不動）
     apply(p.ui.eyedrops ? [] : root.EyeProgressLib.activeEffects(p, root.EYE_CONTENT),
-      { colorblindBoost: (root.EYE_CONTENT.effects || {}).colorblindBoost });
+      { colorblindBoost: boost() });
     announceUnlocks();
   }
 
-  // 有新解鎖的異常題：右下角跳一則提示，點了去測驗頁，幾秒後自己消失。每一題只提示一次。
-  // 文字在 content.js 的 quiz.ui（unlockToast），秒數是 unlockToastSeconds
+  // 有新解鎖的異常題：右下角跳一則提示，點了去測驗頁，按 ✕ 才會關掉。每一題只提示一次。
+  // 文字在 content.js 的 quiz.ui（unlockToast）
   function announceUnlocks() {
     var T = (root.EYE_CONTENT.quiz || {}).ui || {};
     if (!T.unlockToast || !root.EyeProgress.takeNewUnlocks) return;
     var lib = root.EyeProgressLib;
     var p = root.EyeProgress.load();
+    // 畫面上的提示由下往上排；關掉一則，上面的往下補
+    function restack() {
+      Array.prototype.forEach.call(doc.querySelectorAll('.eye-toast'), function (t, i) { t.style.bottom = (16 + i * 56) + 'px'; });
+    }
     function toast(text, href, font) {
-      var t = doc.createElement(href ? 'a' : 'p');
-      if (href) t.href = href;
+      var t = doc.createElement('div');
       t.setAttribute('role', 'status');
       t.className = 'eye-toast';
-      var stack = doc.querySelectorAll('.eye-toast').length; // 畫面上已經有的就往上疊
-      t.textContent = text;
-      t.style.cssText = 'position:fixed;right:16px;bottom:' + (16 + stack * 56) + 'px;z-index:2147483647;margin:0;padding:10px 18px;border-radius:8px;background:#1c2b33;color:#fff;font:' + font + ';text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.35)';
+      t.style.cssText = 'position:fixed;right:16px;z-index:2147483647;display:flex;align-items:center;gap:6px;margin:0;padding:6px 8px 6px 18px;border-radius:8px;background:#1c2b33;color:#fff;font:' + font + ';box-shadow:0 6px 20px rgba(0,0,0,.35)';
+      var label = doc.createElement(href ? 'a' : 'span');
+      if (href) label.href = href;
+      label.textContent = text;
+      label.style.cssText = 'color:inherit;text-decoration:none';
+      var close = doc.createElement('button');
+      close.type = 'button';
+      close.textContent = '✕';
+      close.setAttribute('aria-label', T.closeToast || '✕');
+      close.style.cssText = 'padding:2px 8px;border:0;background:transparent;color:#cfd8dc;font:16px/1 sans-serif;cursor:pointer';
+      close.addEventListener('click', function () { t.remove(); restack(); });
+      t.appendChild(label);
+      t.appendChild(close);
       doc.documentElement.appendChild(t); // 掛在 <body> 外面，才不會被套在 body 上的濾鏡影響
-      root.setTimeout(function () { t.remove(); }, (Number(T.unlockToastSeconds) || 6) * 1000);
+      restack();
     }
-    if (root.EyeProgress.takeNewUnlocks().length) toast(lib.format(T.unlockToast, lib.unlockCount(p, root.EYE_CONTENT)), quizUrl, '700 15px/1.5 sans-serif');
+    // 點了神奇眼藥水之後（通關後才有），什麼提示都不跳，照樣記成提示過了
+    var quiet = !!p.ui.eyedrops;
+    if (root.EyeProgress.takeNewUnlocks().length && !quiet) toast(lib.format(T.unlockToast, lib.unlockCount(p, root.EYE_CONTENT)), quizUrl, '700 15px/1.5 sans-serif');
     // 多一種眼疾效果：用英文病名，像病歷上的字（content.js 的 effects.toast、effects.names）
     var fx = root.EYE_CONTENT.effects || {};
     var fresh = fx.toast && root.EyeProgress.takeNewEffects ? root.EyeProgress.takeNewEffects() : [];
+    if (quiet) fresh = [];
     var have = lib.activeEffects(p, root.EYE_CONTENT).length - fresh.length;
     fresh.forEach(function (type) {
       have += 1;

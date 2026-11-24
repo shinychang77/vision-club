@@ -12,16 +12,14 @@
   document.getElementById('page-intro').textContent = C.quiz.intro;
 
   let progress = P.load();
-  let index = L.firstUnansweredIndex(progress, C); // -1 ＝全部答完
-  const sequence = () => L.questionSequence(progress, C);
-  // 從教團網站使者專區的彈窗過來（網址帶 ?call）：直接從第一題異常題開始，讓玩家看到箭頭
+  // 從教團網站使者專區的彈窗過來之後（記下 zone.event）：測驗只剩異常題，作答保留、可以改；之後回來也一樣
   const zone = C.cult && C.cult.zone;
   const called = () => !!zone && L.hasEvent(progress, zone.event);
   const isAnomaly = (id) => (C.anomalyQuestions || []).some((a) => a.id === id);
-  if (location.search === '?call' && called()) {
-    const first = sequence().findIndex((item) => isAnomaly(item.id));
-    if (first !== -1) index = first;
-  }
+  const sequence = () => L.questionSequence(progress, C).filter((item) => !called() || isAnomaly(item.id));
+  const firstUnanswered = () => sequence().findIndex((item) => !progress.answers[item.id]); // -1 ＝全部答完
+  // 網址帶 ?call（剛從使者專區過來）：從第一題異常題開始，讓玩家看到箭頭
+  let index = location.search === '?call' && called() ? 0 : firstUnanswered();
 
   function render() {
     if (!L.isProfileComplete(progress)) return app.replaceChildren(renderNeedProfile());
@@ -90,7 +88,7 @@
     } else {
       nextButton = el('button', {
         type: 'button', class: 'button', 'data-next': true, disabled: !chosen,
-        onclick: () => { index = L.firstUnansweredIndex(progress, C); render(); }, text: T.toUnanswered
+        onclick: () => { index = firstUnanswered(); render(); }, text: T.toUnanswered
       });
     }
 
@@ -105,12 +103,13 @@
       figure = el('pre', { class: 'quiz-figure quiz-lines', text: q.lines.join('\n') });
     }
 
-    return el('div', { class: 'panel quiz', 'data-question': q.id }, [
+    // 異常題整題灰灰的（site.css 的 .quiz-anomaly）
+    return el('div', { class: 'panel quiz' + (isAnomaly(q.id) ? ' quiz-anomaly' : ''), 'data-question': q.id }, [
       // 題號是固定的：還沒解鎖的題目會跳號，總題數也包含它們
       el('p', { class: 'quiz-count', text: L.format(T.count, { n: L.questionNumber(C, q.id), total: L.fullSequence(C).length }) }),
       el('div', { class: 'meter', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': seq.length, 'aria-valuenow': answered, 'aria-label': '作答進度' },
         el('span', { style: `width:${answered / seq.length * 100}%` })),
-      el('fieldset', { class: 'options' }, [el('legend', { text: q.prompt }), figure].concat(options)),
+      el('fieldset', { class: 'options' }, [el('legend', {}, window.EyeDom.rich(q.prompt)), figure].concat(options)),
       q.note ? el('p', { class: 'quiz-note', text: q.note }) : null,
       el('div', { class: 'actions actions-split' }, [
         el('button', {

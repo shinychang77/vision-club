@@ -68,8 +68,10 @@
     const id = decodeURIComponent(location.hash.slice(1));
     const post = F.posts.find((p) => p.id === id);
     renderUser();
-    const board = id.startsWith('board-') && F.boards.find((b) => 'board-' + b.id === id);
-    if (!id || board) app.replaceChildren(renderIndex(board || F.boards[0]));
+    // 分區列表：#board-分區 或 #board-分區-頁數
+    const m = id.match(/^board-([a-z0-9]+)(?:-(\d+))?$/);
+    const board = m && F.boards.find((b) => b.id === m[1]);
+    if (!id || board) app.replaceChildren(renderIndex(board || F.boards[0], m && m[2] ? Number(m[2]) : 1));
     else if (id === 'login') app.replaceChildren(renderLogin());
     else if (!post) app.replaceChildren(el('div', { class: 'panel' }, [el('p', { text: T.notFound }), backLink()]));
     else if (!L.canReadPost(P.load(), post)) app.replaceChildren(renderLocked(post));
@@ -77,10 +79,15 @@
   }
 
   // 上鎖的文章在列表上只顯示黑框，真正的標題解鎖後才放進頁面
-  // 分區在同一頁用上面的分頁切換，一次只顯示一個分區
-  function renderIndex(board) {
+  // 分區在同一頁用上面的分頁切換，一次只顯示一個分區。文章新的在前面，每頁 T.perPage 篇
+  function renderIndex(board, page) {
     const progress = P.load();
-    const posts = F.posts.filter((p) => p.board === board.id);
+    const all = F.posts.filter((p) => p.board === board.id).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    const per = T.perPage || all.length || 1;
+    const pages = Math.max(1, Math.ceil(all.length / per));
+    page = Math.min(Math.max(1, page || 1), pages);
+    const posts = all.slice((page - 1) * per, page * per);
+    const pageHref = (n) => '#board-' + board.id + (n > 1 ? '-' + n : '');
     return el('div', {}, [
       el('nav', { class: 'board-tabs', 'aria-label': T.boardsLabel }, F.boards.map((b) => el('a', {
         href: '#board-' + b.id, text: b.name, 'aria-current': b === board ? 'page' : null
@@ -97,7 +104,12 @@
             ]),
             open ? el('span', { class: 'reply-count', text: L.format(T.commentCount, { n: countComments(post.comments) }) }) : lockIcon()
           ]));
-        }))
+        })),
+        pages > 1 ? el('nav', { class: 'pager', 'aria-label': T.pagesLabel }, [
+          page > 1 ? el('a', { href: pageHref(page - 1), text: T.prevPage }) : null,
+          ...Array.from({ length: pages }, (_, i) => el('a', { href: pageHref(i + 1), 'aria-current': i + 1 === page ? 'page' : null, text: String(i + 1) })),
+          page < pages ? el('a', { href: pageHref(page + 1), text: T.nextPage }) : null
+        ]) : null
       ])
     ]);
   }

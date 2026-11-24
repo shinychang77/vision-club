@@ -18,9 +18,11 @@
 
   // 有 href 的項目不是詞條，是搜尋得到的連結（例如論壇入口）
   const link = (entry) => el('a', { href: entry.href || '#' + entry.id, text: entry.title });
+  const newTab = (a) => { a.target = '_blank'; a.rel = 'noopener'; return a; };
 
-  // 補充詞條（有紅字或清晰度滑桿的）放「知識庫」；其他找到的（主線的文件和連結）放「搜尋歷史」
-  const isExtra = (entry) => !entry.href && entry.blocks.some((b) => b.type === 'red' || b.type === 'clarity');
+  // 詞條（知覺、演化這類科普，之後每條都有清晰度滑桿的示意圖）放「知識庫」；新聞和搜得到的連結是主線，放「搜尋歷史」。
+  // 搜「新聞」會一次找到三則新聞（它們的 keywords 都有「新聞」）
+  const isExtra = (entry) => !entry.href && entry.category !== '新聞';
   const foundEntries = () => P.load().wiki.found.map((id) => W.entries.find((e) => e.id === id)).filter(Boolean);
 
   // 搜尋歷史：主線找到的文件和連結，最新的在上面
@@ -53,7 +55,7 @@
     results.replaceChildren(el('div', { class: 'search-results' }, [
       el('p', { class: 'search-title', text: L.format(W.searchResultTitle, { q: query }) }),
       found.length
-        ? el('ul', {}, found.map((entry) => el('li', {}, [link(entry), el('small', { text: entry.summary })])))
+        ? el('ul', {}, found.map((entry) => el('li', {}, [newTab(link(entry)), el('small', { text: entry.summary })]))) // 找到的東西開新分頁
         : el('p', { class: 'muted', text: L.format(W.searchEmpty, { q: query }) })
     ]));
   }
@@ -105,8 +107,15 @@
       el('h2', { text: entry.title }),
       el('p', { class: 'entry-meta', text: `${W.updatedLabel} ${L.isoToDots(entry.updated)}` }),
       ...entry.blocks.flatMap(renderBlock),
-      el('p', {}, el('a', { href: 'wiki.html', text: W.backToIndex }))
+      el('p', {}, el('a', { href: 'wiki.html', text: W.backToIndex })),
+      isExtra(entry) ? el('p', { class: 'entry-order', text: L.format(W.foundOrder, foundOrder(entry)) }) : null
     ]);
+  }
+
+  // 這個詞條是玩家第幾個找到的（照找到的先後），以及詞條一共有幾個
+  function foundOrder(entry) {
+    const found = foundEntries().filter(isExtra);
+    return { n: found.indexOf(entry) + 1 || found.length + 1, total: W.entries.filter(isExtra).length };
   }
 
   function renderBlock(block) {
@@ -124,17 +133,18 @@
     }
   }
 
-  // ---- 清晰度滑桿：清晰度越低越模糊，低於門檻時浮現紅字。requires 的事件（通關）發生前只有圖，沒有滑桿 ----
+  // ---- 清晰度滑桿：清晰度越低越模糊，低於門檻時浮現藏在圖裡的字（0 號使者用拉丁文寫的，和抄本同一個人、同一種墨水）。requires 的事件（通關）發生前只有圖，沒有滑桿 ----
   // 這個元件之後的「亮度／無光」機關也可以照同樣方式寫（企劃書附錄 B-B）
   function renderClarity(block) {
     const image = el('div', { class: 'clarity-image', role: 'img', 'aria-label': block.alt });
-    image.innerHTML = block.svg; // svg 欄位來自 content.js，是作者自己寫的內容
+    if (block.src) image.append(el('img', { src: block.src, alt: '' })); // 圖片檔
+    else image.innerHTML = block.svg; // svg 欄位來自 content.js，是作者自己寫的內容
     if (block.requires && !L.hasEvent(P.load(), block.requires)) {
       return el('figure', { class: 'clarity' }, [el('div', { class: 'clarity-frame' }, image), el('figcaption', { text: block.lockedCaption || block.caption })]);
     }
     // 訊息只在達到門檻時才放進頁面，平常用 Ctrl+F 或全選都找不到
     const reveal = el('div', { class: 'clarity-reveal', 'aria-hidden': 'true' });
-    const fillReveal = () => reveal.replaceChildren(el('p', { class: 'red-text', text: block.revealText }));
+    const fillReveal = () => reveal.replaceChildren(el('p', { class: 'ink-text', lang: 'la' }, window.EyeDom.rich(block.revealText)));
     reveal.addEventListener('transitionend', () => {
       if (!reveal.classList.contains('is-shown')) reveal.replaceChildren();
     });
@@ -145,7 +155,7 @@
       const value = Number(slider.value);
       image.style.filter = value >= 100 ? 'none' : `blur(${((100 - value) / 100 * block.maxBlur).toFixed(2)}px)`;
       output.textContent = value + '%';
-      const shown = value < block.revealBelow;
+      const shown = !!block.revealText && value < block.revealBelow;
       if (shown && !reveal.children.length) {
         fillReveal();
         void reveal.offsetWidth; // 先讓瀏覽器算一次版面，淡入動畫才會觸發

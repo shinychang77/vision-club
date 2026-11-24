@@ -181,6 +181,17 @@
     P.addEvent(E.event);
     if (window.EyeEffects) window.EyeEffects.refresh(); // 看見眼睛帶來的眼疾效果，馬上套用
     say(E.lines.join(''), true);
+    // 右邊面板狀態列的那行紅字也一樣：原本的字變透明，在 <body> 外面疊一層紅字，眼疾效果蓋不到
+    const echo = el('p', { class: 'sem-status-layer', 'aria-hidden': 'true', text: E.lines.join('') });
+    const placeEcho = () => {
+      const r = status.getBoundingClientRect();
+      Object.assign(echo.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px' });
+    };
+    status.style.color = 'transparent';
+    placeEcho();
+    document.documentElement.append(echo);
+    window.addEventListener('scroll', placeEcho, { passive: true });
+    window.addEventListener('resize', placeEcho);
     // 字一行一行出現，每一行比上一行更往右下，排成階梯
     const text = el('p', { class: 'sem-eye-text' }, E.lines.map((line, i) => {
       const span = el('span', { text: line });
@@ -188,8 +199,20 @@
       span.style.animationDelay = i * E.lineDelay + 'ms';
       return span;
     }));
-    view.append(text);
+    // 紅字放在 <body> 外面一層，疊在畫面上：眼疾效果的濾鏡蓋不到，一直是紅的
+    const layer = el('div', { class: 'sem-eye-layer', 'aria-hidden': 'true' }, text);
+    const place = () => {
+      const r = view.getBoundingClientRect();
+      Object.assign(layer.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    };
+    place();
+    document.documentElement.append(layer);
+    window.addEventListener('scroll', place, { passive: true });
+    window.addEventListener('resize', place);
     setTimeout(() => {
+      layer.remove();
+      window.removeEventListener('scroll', place);
+      window.removeEventListener('resize', place);
       cutOff();
       addLog(); // 系統在斷線前存下的紀錄，接在已擷取影像下面
     }, cfg.eye.lostDelay);

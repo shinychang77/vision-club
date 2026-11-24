@@ -62,7 +62,11 @@ window.EyeDom = {
   },
   // 一整格內文 → 一段一段的 <p>：空一行是新的一段，只換行就是段落裡換行（.txt 保留換行和連續空格）
   paras(text, cls) {
-    return String(text || '').split(/\n[ \t　]*\n/).map((t) => window.EyeDom.el('p', { class: cls ? cls + ' txt' : 'txt', text: t }));
+    return String(text || '').split(/\n[ \t　]*\n/).map((t) => window.EyeDom.el('p', { class: cls ? cls + ' txt' : 'txt' }, window.EyeDom.rich(t)));
+  },
+  // 文字裡用 [[ ]] 包起來的字畫成紅字：指 OPHANIM（眼睛）的「祂」「祂們」，讓玩家分得出是哪一方。回傳一串可以直接放進元素的子節點
+  rich(text) {
+    return String(text || '').split(/\[\[(.+?)\]\]/).map((part, i) => (i % 2 ? window.EyeDom.el('span', { class: 'oph', text: part }) : part)).filter((x) => x !== '');
   },
   // 指向選項的箭頭，代表兩股勢力：'dots' 點狀的、'red' 紅色的。只在玩家從使者專區的彈窗過來之後出現。
   // 眼疾效果的濾鏡套在 <body> 上，所以真正看得到的箭頭畫在 <body> 外面、蓋在效果上面，不受影響（眼睛最後的掙扎）；

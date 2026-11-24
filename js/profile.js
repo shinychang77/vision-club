@@ -57,9 +57,9 @@
     age.removeAttribute('aria-invalid');
     saveStatus.textContent = T.saved;
     fill();
-    if (window.EyeEffects) window.EyeEffects.refresh(); // 年齡填到幼兒會解鎖一題，馬上跳提示
-    // 從測驗頁被請過來補資料的，存好就回去作答
-    if (location.search === '?next=quiz') location.href = 'quiz.html';
+    // 從測驗頁被請過來補資料的，存好就回去作答（解鎖提示到測驗頁再跳）
+    if (location.search === '?next=quiz') { location.href = 'quiz.html'; return; }
+    if (window.EyeEffects) window.EyeEffects.refresh(); // 年齡填到幼兒會解鎖一題：按「儲存」後才跳提示
   });
 
   const resetButton = el('button', { type: 'button', class: 'button button-danger', text: T.resetButton });

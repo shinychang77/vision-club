@@ -149,8 +149,6 @@ h1 { margin: 0 0 16px; font-size: 40px; }
 /* 首頁：四種類型的貼紙卡（內容來自 content.js 的 result.types） */
 .type-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
 .type-card { padding: 20px; border: 2px solid var(--ink); border-radius: 14px; background: var(--paper); box-shadow: 0 5px 0 var(--ink); }
-.type-card:nth-child(odd) { transform: rotate(-1.2deg); }
-.type-card:nth-child(even) { transform: rotate(1deg); }
 .type-name { width: fit-content; margin: 0 0 8px; padding: 0 4px; background: var(--marker); font-size: 26px; line-height: 1.3; }
 .type-quote { margin: 0 0 14px; color: var(--brand); font-size: 15px; font-weight: 700; line-height: 1.6; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
@@ -204,7 +202,8 @@ details p { margin: 0 0 16px; color: var(--muted); }
 /* 結局（結果頁）：最後的警告、最後一題、兩個結局。選「否」的結局整塊變黑 */
 .ending p { margin: 0 0 16px; line-height: 2; }
 .ending h2 { margin: 24px 0 16px; font-size: 24px; }
-[data-ending="no"] .ending { border-color: #000; background: #0c0c0c; color: #e8e4dc; }
+/* 兩個結局都是黑底白字 */
+[data-ending="yes"] .ending, [data-ending="no"] .ending { border-color: #000; background: #0c0c0c; color: #f2f0ea; }
 .ending .ending-notice { margin-top: 32px; font-size: 14px; line-height: 1.8; }
 .ending a { color: inherit; }
 .ending-letter { margin: 8px 0 24px; }
@@ -270,6 +269,53 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visib
 .quiz-figure { margin: 0 0 20px; padding: 16px; border-radius: var(--radius); background: var(--tint); }
 .quiz-figure svg { display: block; width: 100%; max-width: 360px; height: auto; margin: 0 auto; }
 .quiz-figure img { display: block; max-width: 100%; max-height: 420px; height: auto; margin: 0 auto; }
+/* 異常題：整題褪成灰灰的，蒙一層細雜訊，像訊號不好（顏色留一點，色塊那題還分得出來） */
+.quiz-anomaly { position: relative; filter: grayscale(.6) contrast(.92) brightness(.97); }
+.quiz-anomaly::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: .18;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .18) 0 1px, transparent 1px 3px); animation: quiz-static .25s steps(2) infinite; }
+@keyframes quiz-static { 50% { transform: translateY(1px); } }
+@media (prefers-reduced-motion: reduce) { .quiz-anomaly::after { animation: none; } }
+/* 視界首頁的假廣告（js/ad.js）：故意做得很廉價。掛在 <body> 外面，固定在左下角 */
+.fake-ad { position: fixed; left: 16px; bottom: 16px; z-index: 2147483400; width: 280px; overflow: hidden; border: 1px solid #b8b8b8; border-radius: 6px; background: #fff; box-shadow: 0 8px 28px rgba(0, 0, 0, .35); font: 14px/1.4 "Microsoft JhengHei", "PingFang TC", sans-serif; color: #222; animation: fake-ad-in .4s ease-out; }
+@keyframes fake-ad-in { from { transform: translateY(120%); } }
+.fake-ad { transition: transform .45s cubic-bezier(.2, .9, .3, 1.2); }
+.fake-ad.is-big { animation: none; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+.fake-ad-shade { position: fixed; inset: 0; z-index: 2147483399; background: rgba(0, 0, 0, .55); }
+/* 字幕：顏色一直換、帶螢光，廉價手遊廣告那種 */
+.fake-ad-caption, .fake-ad-neon { animation: fake-ad-neon 1.2s linear infinite; }
+@keyframes fake-ad-neon {
+  0%, 100% { color: #fff36b; text-shadow: 0 0 6px #fff36b, 0 0 14px #ffb300; }
+  25% { color: #6bfffb; text-shadow: 0 0 6px #6bfffb, 0 0 14px #00a2ff; }
+  50% { color: #ff7bf2; text-shadow: 0 0 6px #ff7bf2, 0 0 14px #ff00a8; }
+  75% { color: #8dff6b; text-shadow: 0 0 6px #8dff6b, 0 0 14px #00d13b; }
+}
+.fake-ad-bar { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 2px 8px; background: #f1f1f1; color: #777; font-size: 11px; }
+.fake-ad-x { padding: 0 6px; border: 0; background: transparent; color: #666; font-size: 14px; cursor: pointer; }
+.fake-ad-body { position: relative; }
+.fake-ad-stage { cursor: pointer; }
+.fake-ad-stage svg { display: block; width: 100%; height: auto; }
+.fake-ad-title { margin: 0; color: #ffe600; font-size: 22px; font-weight: 900; text-align: center; -webkit-text-stroke: 1.5px #d10000; paint-order: stroke fill; text-shadow: 0 3px 0 #7a0000; }
+.fake-ad-hint { margin: 0; color: #ff2020; font-weight: 900; text-align: center; text-shadow: 0 1px 0 #fff, 0 0 4px #fff; }
+.is-runner .fake-ad-title { position: absolute; left: 0; right: 0; top: 2px; pointer-events: none; }
+.fake-ad-title.fake-ad-neon { -webkit-text-stroke: 3px #000; } /* 螢光字配黑邊，跟阿嬤的字幕一樣 */
+.is-runner .fake-ad-hint { position: absolute; left: 0; right: 0; top: 150px; pointer-events: none; }
+.fake-ad-granny { position: relative; }
+.fake-ad-granny img { display: block; width: 100%; height: auto; }
+.fake-ad-caption { position: absolute; left: 0; right: 0; bottom: 10px; margin: 0; color: #fff; font-size: 19px; font-weight: 900; line-height: 1.35; text-align: center; -webkit-text-stroke: 4px #000; paint-order: stroke fill; }
+.fa-gates text { fill: #fff; font: 900 22px/1 sans-serif; stroke: #000; stroke-width: 1.2px; paint-order: stroke; }
+.fa-count { fill: #fff; font: 900 13px/1 sans-serif; stroke: #000; stroke-width: 2.5px; paint-order: stroke; }
+.fa-count.is-pop { fill: #ffe600; font-size: 16px; }
+.fa-ring { animation: fake-ad-spin 6s linear infinite; }
+@keyframes fake-ad-spin { to { transform: rotate(360deg); } }
+.fa-crowd { transition: opacity .2s; }
+.fa-man { animation: fake-ad-bob .3s ease-in-out infinite alternate; }
+@keyframes fake-ad-bob { to { transform: translateY(-2px); } }
+.fake-ad-hand { position: absolute; left: 122px; top: 118px; font-size: 26px; pointer-events: none; animation: fake-ad-hand 1.6s ease-in-out infinite; }
+@keyframes fake-ad-hand { 0%, 100% { transform: translateX(-40px); } 50% { transform: translateX(40px); } }
+.fake-ad-btn { padding: 6px 18px; border: 2px solid #b36b00; border-radius: 999px; background: linear-gradient(#ffe27a, #ffb000); color: #5a2a00; font: 900 15px/1.3 inherit; box-shadow: 0 3px 0 #b36b00; cursor: pointer; }
+.fake-ad-options { display: flex; justify-content: center; gap: 12px; padding: 8px 0 4px; }
+.fake-ad-foot { margin: 0; padding: 4px 8px 6px; color: #888; font-size: 11px; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .fa-ring, .fa-man, .fake-ad-hand, .fake-ad-caption, .fake-ad-neon { animation: none; } .fake-ad { transition: none; } }
 /* 結局前的錯誤視窗（js/result.js）：掛在 <body> 外面，眼疾效果的濾鏡和疊加層都蓋不到，字一直是紅的 */
 .ending-shade { position: fixed; inset: 0; z-index: 2147483600; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, .35); }
 .ending-popup { width: min(420px, 100%); border: 1px solid #7a7a7a; background: #f0f0f0; box-shadow: 4px 6px 24px rgba(0, 0, 0, .45); font: 15px/1.6 "Microsoft JhengHei", "PingFang TC", sans-serif; color: #c00000; }
@@ -313,12 +359,17 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visib
 .entry-meta { margin: 0 0 24px; color: var(--muted); font-size: 13px; }
 .entry p { margin: 0 0 16px; }
 .red-text { color: var(--red); font-weight: 700; letter-spacing: .05em; }
+.oph { color: var(--red); } /* 指 OPHANIM 的「祂」：文字裡用 [[ ]] 包起來（site.js 的 EyeDom.rich） */
+.ending .oph { color: #ff4a36; }
+.ink-text .oph { color: #b21700; }
 .refs { margin: 32px 0 0; padding: 16px 0 0 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
 
 .clarity { max-width: 360px; margin: 24px 0 28px; }
 .clarity-frame { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: #e9eef0; aspect-ratio: 1; }
 .clarity-image { width: 100%; height: 100%; }
-.clarity-image svg { display: block; width: 100%; height: 100%; }
+.clarity-image svg, .clarity-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* 滑桿拉到模糊才浮現的字：手抄本的墨水字（0 號使者寫的拉丁文，長 s 寫法和抄本頁緣一樣） */
+.ink-text { margin: 0; color: #2a1608; font: italic 600 23px/1.35 "Palatino Linotype", "Book Antiqua", "Times New Roman", serif; letter-spacing: .02em; text-shadow: 0 0 1px rgba(42, 22, 8, .7), 0 0 8px rgba(255, 246, 224, .85), 0 0 16px rgba(255, 246, 224, .6); }
 .clarity-reveal {
   position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 16px; text-align: center; opacity: 0; transition: opacity 1.2s ease-in; pointer-events: none;
@@ -363,6 +414,11 @@ input:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visib
 .board-tabs a[aria-current="page"] { border-bottom-color: currentColor; color: inherit; background: var(--marker); }
 .board-desc { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
 .post-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.entry-order { margin-top: 28px; color: var(--muted); font-size: 13px; text-align: right; letter-spacing: .1em; }
+.pager { display: flex; justify-content: center; gap: 6px; margin-top: 18px; }
+.pager a { min-width: 36px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; color: inherit; text-align: center; text-decoration: none; }
+.pager a:hover { border-color: var(--brand); }
+.pager a[aria-current="page"] { border-color: var(--ink); background: var(--marker); font-weight: 700; }
 .post-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); color: var(--ink); text-decoration: none; transition: transform .1s, box-shadow .1s, border-color .1s; }
 .post-card:hover { border-color: var(--brand); box-shadow: 0 4px 0 var(--line); transform: translateY(-2px); }
 .post-main { display: flex; flex: 1; flex-direction: column; align-items: flex-start; min-width: 0; }

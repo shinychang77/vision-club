@@ -42,9 +42,12 @@
   function route() {
     const file = K.files.find((x) => location.hash === '#file-' + x.id);
     const area = B.areas.find((x) => location.hash === '#area-' + x.id);
-    const view = file ? renderFile(file) : area ? renderArea(area) : location.hash === '#zone' ? renderZone() : location.hash === '#about' ? renderAbout() : renderHome();
+    const person = (K.people || []).find((x) => location.hash === '#person-' + x.id);
+    const view = file ? renderFile(file) : area ? renderArea(area) : person ? renderPerson(person)
+      : location.hash.startsWith('#search=') ? renderResults(decodeURIComponent(location.hash.slice(8)))
+      : location.hash === '#zone' ? renderZone() : location.hash === '#about' ? renderAbout() : renderHome();
     app.replaceChildren(...view.filter(Boolean)); // 沒有表格的文件會有空項目，要濾掉
-    const here = file || area ? null : location.hash.replace(/^#$/, ''); // 文件頁、團契裡的地方不算導覽列上的任何一頁
+    const here = file || area || person ? null : location.hash.replace(/^#$/, ''); // 文件頁、團契裡的地方不算導覽列上的任何一頁
     navLinks.forEach((a) => a.setAttribute('aria-current', a.dataset.hash === here ? 'page' : 'false'));
     window.scrollTo(0, 0);
   }
@@ -199,24 +202,55 @@
   // 成員（跑馬燈的名字，打全名）、使者專區。成員和地方都點得進去，只是受邀者進不了
   function renderSearch() {
     const input = el('input', { type: 'search', id: 'fs-q', autocomplete: 'off', placeholder: T.label, 'aria-label': T.label });
-    const results = el('div', { class: 'fs-results', 'aria-live': 'polite' });
     const form = el('form', { class: 'fs-search', role: 'search' }, [
-      el('div', {}, [input, el('button', { type: 'submit', text: T.button })]),
-      results
+      el('div', {}, [input, el('button', { type: 'submit', text: T.button })])
     ]);
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      const q = lib.normalizeCode(input.value).replace(/^@/, '');
-      if (!q) { results.replaceChildren(); return; }
-      const found = K.files.filter((file) => file.keywords.some((k) => lib.normalizeCode(k) === q))
-        .map((file) => el('p', {}, el('a', { href: '#file-' + file.id, text: file.title })));
-      const hit = (words) => (words || []).some((k) => lib.normalizeCode(k) === q);
-      B.areas.filter((a) => hit(a.keywords.concat(a.title))).forEach((a) => found.push(el('p', {}, el('a', { href: '#area-' + a.id, text: a.title }))));
-      B.ticker.names.filter((name) => hit([name])).forEach((name) => found.push(el('p', {}, el('a', { href: '#area-members', text: lib.format(T.member, { name }) }))));
-      if (hit(Z.keywords)) found.push(el('p', {}, el('a', { href: '#zone', text: Z.title })));
-      results.replaceChildren(...(found.length ? found : [el('p', { text: T.empty })]));
+      const q = input.value.trim();
+      if (q) location.hash = '#search=' + encodeURIComponent(q);
     });
     return form;
+  }
+
+  // 搜尋結果頁（#search=關鍵字）：文件、團契裡的地方、人物頁、成員、使者專區。點了開新分頁
+  function renderResults(raw) {
+    const q = lib.normalizeCode(raw).replace(/^@/, '');
+    const hit = (words) => !!q && (words || []).some((k) => lib.normalizeCode(k) === q);
+    const found = K.files.filter((file) => hit(file.keywords)).map((file) => ['#file-' + file.id, file.title])
+      .concat(B.areas.filter((a) => hit(a.keywords.concat(a.title))).map((a) => ['#area-' + a.id, a.title]))
+      .concat((K.people || []).filter((x) => hit([x.name])).map((x) => ['#person-' + x.id, lib.format(T.member, { name: x.name })]))
+      .concat(B.ticker.names.filter((name) => hit([name])).map((name) => ['#area-members', lib.format(T.member, { name })]))
+      .concat(hit(Z.keywords) ? [['#zone', Z.title]] : []);
+    return [
+      el('h1', { text: lib.format(T.resultTitle, { q: raw }) }),
+      found.length
+        ? el('ul', { class: 'fs-results' }, found.map(([href, text]) => el('li', {}, el('a', { href, target: '_blank', rel: 'noopener', text }))))
+        : el('p', { class: 'fs-status', text: T.empty }),
+      el('p', { class: 'fs-footer' }, el('a', { href: 'index.html', text: T.back }))
+    ];
+  }
+
+  // 人物頁上的「加入」：按了只說要先成為團契的一員
+  function joinButton() {
+    const status = el('p', { class: 'fs-status', role: 'status' });
+    return el('div', { class: 'fs-join' }, [
+      el('button', { type: 'button', class: 'fs-join-button', text: T.join, onclick: () => { status.textContent = T.joinDenied; } }),
+      status
+    ]);
+  }
+
+  // 人物頁（#person-id）：頭像、名字、上線狀態、入會的時間、「加入」按鈕、自我介紹
+  function renderPerson(x) {
+    return [el('div', { class: 'fs-person' }, [
+      el('img', { class: 'fs-avatar', src: x.avatar, alt: x.name }),
+      el('h1', { text: x.name }),
+      el('p', { class: 'fs-presence' + (x.online ? ' is-online' : '') }, [el('span', { class: 'fs-dot', 'aria-hidden': 'true' }), x.status]),
+      el('p', { class: 'fs-joined', text: T.joined + '　' + x.joined }),
+      joinButton(),
+      el('div', { class: 'fs-bio' }, window.EyeDom.paras(x.bio)),
+      el('p', { class: 'fs-footer' }, el('a', { href: 'index.html', text: T.back }))
+    ])];
   }
 
   // 搜到的文件。有 code 的要用密碼打開（打開後記下事件），沒有的直接看

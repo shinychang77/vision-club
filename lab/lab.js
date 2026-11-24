@@ -22,18 +22,23 @@
   document.getElementById('lab-name').textContent = L.unitName;
   document.getElementById('lab-back').textContent = L.backToMain;
   // ---- 深色模式：玩家把裝置切成深色模式、而且已經登入時，首頁整個變黑，中間浮現一行平常看不到的字 ----
-  // 黑幕擋住整頁也擋住點擊，玩家得切回淺色模式才能繼續，不會一直開著深色模式玩、把眼疾效果看淡
+  // 黑幕擋住整頁，點一下才收起來；離開首頁再回來、或重新切成深色模式，就會再出現一次。
+  // 本來就開深色模式的玩家不會卡住，但每次回首頁都要再點一次，不會一直開著深色模式玩、把眼疾效果看淡
   // 網頁讀不到螢幕亮度，但讀得到系統是不是深色模式。對應世界觀「光是眼睛的食物」
   const glow = el('p', { class: 'lab-glow', 'aria-live': 'polite' });
   const dark = window.matchMedia('(prefers-color-scheme: dark)');
+  let dismissed = false; // 這一次待在首頁時點掉了
   function applyDim() {
-    const show = dark.matches && !!member() && location.hash.length < 2; // 只有首頁有字
-    glow.textContent = show ? D.text : '';                              // 平常不放進頁面，全選或搜尋都找不到
+    const home = location.hash.length < 2; // 只有首頁有字
+    if (!home) dismissed = false;           // 離開首頁就重來，回首頁會再出現
+    const show = dark.matches && !!member() && home && !dismissed;
+    glow.textContent = show ? D.text : '';  // 平常不放進頁面，全選或搜尋都找不到
     glow.classList.toggle('is-shown', show);
   }
-  dark.addEventListener('change', applyDim);
+  glow.addEventListener('click', () => { dismissed = true; applyDim(); });
+  dark.addEventListener('change', () => { dismissed = false; applyDim(); });
   document.documentElement.append(glow); // 掛在 <body> 外面：眼疾效果會在 body 加濾鏡，裡面的 fixed 元素就不會貼著螢幕了
-  document.getElementById('lab-footer').textContent = H.footer;
+  document.getElementById('lab-footer').replaceChildren(el('p', { text: H.footer }), H.phone ? el('p', { text: H.phone }) : '');
 
   const member = () => L.members.find((m) => m.id === P.load().lab.user) || null;
 
@@ -41,10 +46,10 @@
     const file = L.files.find((x) => location.hash === '#file-' + x.id);
     const page = L.pages.find((x) => location.hash === '#' + x.id);
     const doc = L.docs.find((x) => location.hash === '#doc-' + x.id);
-    const inside = /^#(staff|chat|file-|doc-)/.test(location.hash); // 員工專區裡面的頁面
+    const inside = /^#(staff|chat|file-|doc-|search=)/.test(location.hash); // 員工專區裡面的頁面
     renderNav(page, inside);
     document.getElementById('lab-search').replaceChildren(renderSearch()); // 搜尋框固定在頁首右上角，每一頁都有
-    main.replaceChildren(...[inside && member() ? portalBar() : null, ...(file ? renderFile(file) : doc ? renderDoc(doc) : page ? renderPage(page) : location.hash.startsWith('#chat') ? renderChat() : location.hash === '#staff' ? renderStaff() : renderHome())].filter(Boolean)); // 沒有照片的地方會有空項目，要濾掉
+    main.replaceChildren(...[inside && member() ? portalBar() : null, ...(file ? renderFile(file) : doc ? renderDoc(doc) : page ? renderPage(page) : location.hash.startsWith('#search=') ? renderResults(decodeURIComponent(location.hash.slice(8))) : location.hash.startsWith('#chat') ? renderChat() : location.hash === '#staff' ? renderStaff() : renderHome())].filter(Boolean)); // 沒有照片的地方會有空項目，要濾掉
     applyDim();
     window.scrollTo(0, 0);
   }
@@ -149,7 +154,7 @@
         el('h2', { text: PT.menuTitle }),
         el('ul', {}, [
           link('sem.html', T.semLink),
-          link('#chat', CH.link, CH.threads.filter((t) => !opened.has(t.id)).reduce((n, t) => n + (t.unread || 0), 0))
+          link('#chat', CH.link, CH.threads.filter((t) => !isRead(t.id)).reduce((n, t) => n + (t.unread || 0), 0))
         ])
       ]),
       el('section', {}, [
@@ -206,14 +211,29 @@
       if (locked) return;
       const q = input.value.trim();
       if (P.openLock(S, q).ok) { input.disabled = true; crossToCult(input, q); return; }
-      // 不是暗號：找內部文件，關鍵字要完全打對
-      const want = lib.normalizeCode(q);
-      const found = want ? L.docs.filter((d) => d.keywords.some((k) => lib.normalizeCode(k) === want)) : [];
-      status.replaceChildren(...(found.length
-        ? found.map((d) => el('a', { href: '#doc-' + d.id, text: d.title }))
-        : [q ? lib.format(S.empty, { q }) : '']));
+      // 不是暗號：到搜尋結果頁
+      if (q) location.hash = '#search=' + encodeURIComponent(q);
     });
     return form;
+  }
+
+  // 搜尋結果頁（#search=關鍵字）：內部文件（關鍵字要完全打對）和外部連結（search.links），點了開新分頁
+  function renderResults(q) {
+    const home = el('p', {}, el('a', { href: '#staff', text: T.toStaff }));
+    if (!member()) return [el('p', { text: T.needLogin }), home];
+    const want = lib.normalizeCode(q);
+    const hit = (words) => !!want && words.some((k) => lib.normalizeCode(k) === want);
+    const found = L.docs.filter((d) => hit(d.keywords)).map((d) => ({ href: '#doc-' + d.id, title: d.title }))
+      .concat((S.links || []).filter((x) => hit(x.keywords)));
+    return [
+      el('h1', { text: lib.format(S.resultTitle, { q }) }),
+      found.length
+        ? el('ul', { class: 'lab-results' }, found.map((x) => el('li', {}, [
+          el('a', { href: x.href, target: '_blank', rel: 'noopener', text: x.title }), x.note ? el('small', { text: x.note }) : null
+        ])))
+        : el('p', { text: lib.format(S.empty, { q }) }),
+      home
+    ];
   }
 
   // ---- 輸入暗號後的過場（範例見 dev/cult-styles.html 的 D＋E）----
@@ -251,13 +271,13 @@
   }
 
   // 訊息（#chat、#chat-對象 id）：左邊是聊天對象，右邊是對話和輸入欄。帳號是唯讀的，送不出去。
-  // 打開過的對象不再算未讀（只記在這一頁，重新整理又會出現，和真的系統一樣會「還沒同步」）
-  const opened = new Set();
+  // 打開過的對象不再算未讀（記在進度的 ui.read，換頁、重新整理都一樣）
+  const isRead = (id) => P.load().ui.read.indexOf(id) !== -1;
   function renderChat() {
     const home = el('p', {}, el('a', { href: '#staff', text: T.toStaff }));
     if (!member()) return [el('p', { text: T.needLogin }), home];
     const t = CH.threads.find((x) => location.hash === '#chat-' + x.id) || CH.threads[0];
-    opened.add(t.id);
+    P.markRead(t.id);
     const avatar = (name) => el('span', { class: 'lab-avatar', 'aria-hidden': 'true', text: name.replace('@', '')[0].toUpperCase() });
     const input = el('input', { type: 'text', id: 'lab-chat-input', autocomplete: 'off', placeholder: CH.placeholder, 'aria-label': CH.placeholder });
     const status = el('p', { class: 'lab-status', role: 'status' });
@@ -268,7 +288,7 @@
       el('div', { class: 'lab-messenger' }, [
         el('nav', { class: 'lab-contacts', 'aria-label': CH.title }, el('ul', {}, CH.threads.map((x) => {
           const last = x.messages[x.messages.length - 1];
-          const unread = opened.has(x.id) ? 0 : x.unread;
+          const unread = isRead(x.id) ? 0 : x.unread;
           return el('li', {}, el('a', { href: '#chat-' + x.id, 'aria-current': x === t ? 'page' : null }, [
             avatar(x.name),
             el('span', { class: 'lab-contact-name' }, [el('b', { text: x.name }), el('time', { text: last.time.split(' ')[0] })]),
@@ -278,11 +298,11 @@
         el('section', { class: 'lab-thread' }, [
         el('header', { class: 'lab-thread-head' }, [el('b', { text: t.name }), el('span', { class: 'lab-tag', text: t.tag })]),
         el('ol', { class: 'lab-chat' }, t.messages.map((m) => {
-          const name = m.me ? member().name : t.name;
+          // 左右對話：對方在左邊（有頭像），自己在右邊
           return el('li', { class: m.me ? 'is-me' : null }, [
-            avatar(name),
-            el('p', { class: 'lab-chat-meta' }, [el('b', { text: name }), m.time ? el('time', { text: m.time }) : null]),
-            el('p', { text: m.text })
+            m.me ? null : avatar(t.name),
+            el('p', { class: 'lab-bubble', text: m.text }),
+            m.time ? el('time', { class: 'lab-chat-time', text: m.time }) : null
           ]);
         })),
         t.end ? el('p', { class: 'lab-chat-end', text: t.end }) : null,

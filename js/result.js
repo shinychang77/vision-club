@@ -162,7 +162,8 @@
     el('div', { class: 'share' }, [
       textBox,
       el('div', { class: 'actions' }, [
-        el('button', { type: 'button', class: 'button', onclick: copyText, text: R.copyButton }),
+        el('button', { type: 'button', class: 'button', onclick: share, text: R.shareButton }),
+        el('button', { type: 'button', class: 'button button-secondary', onclick: copyText, text: R.copyButton }),
         el('button', { type: 'button', class: 'button button-secondary', onclick: downloadPng, text: R.downloadButton }),
         el('a', { class: 'text-link', href: 'quiz.html', text: R.retakeLink })
       ]),
@@ -181,6 +182,21 @@
       out += list[(h >>> 0) % list.length];
     }
     return out;
+  }
+
+  // 系統的分享選單：能附檔就附上結果卡圖片；不能分享（多半是電腦版瀏覽器）就改成複製文字
+  async function share() {
+    if (!navigator.share) return copyText();
+    const data = { text: shareText };
+    try {
+      const blob = await new Promise((resolve) => card.toBlob(resolve, 'image/png'));
+      const file = blob && new File([blob], R.downloadName, { type: 'image/png' });
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) data.files = [file];
+      await navigator.share(data);
+    } catch (e) {
+      if (e && e.name === 'AbortError') return; // 玩家自己按了取消
+      copyText();
+    }
   }
 
   async function copyText() {

@@ -19,6 +19,7 @@
  *   "ui": { "notices": { "n-a1": "2026-11-05" }, // 異常介面狀態：各異常公告第一次出現的日期
  *           "announced": ["a2"],               // 已經跳過「解鎖新題目」提示的異常題 id
  *           "announcedFx": ["cataract"],       // 已經跳過「多一種效果」提示的眼疾效果
+ *           "read": ["feng"],                  // 研究中心訊息裡已經打開過的聊天對象（未讀數字不再出現）
  *           "eyedrops": false },                 // 通關後的「神奇眼藥水」：true 時所有網站都不顯示眼疾效果
  *   "wiki": { "searches": ["錯視"],      // 知識庫頁的搜尋歷史，最新的在前，最多 10 筆
  *             "found": ["pareidolia"] }, // 已找到的詞條 id（搜尋搜到的，或直接開網址看過的），依找到的順序
@@ -49,7 +50,7 @@
       unlocked: [],
       profile: { nickname: '', age: null },
       photos: [],
-      ui: { notices: {}, announced: [], announcedFx: [], eyedrops: false },
+      ui: { notices: {}, announced: [], announcedFx: [], read: [], eyedrops: false },
       wiki: { searches: [], found: [] },
       forum: { user: null },
       lab: { user: null },
@@ -152,6 +153,12 @@
     if (isObj(raw.ui) && Array.isArray(raw.ui.announced)) {
       raw.ui.announced.forEach(function (id) {
         if (p.unlocked.indexOf(id) !== -1 && p.ui.announced.indexOf(id) === -1) p.ui.announced.push(id);
+      });
+    }
+
+    if (isObj(raw.ui) && Array.isArray(raw.ui.read)) {
+      raw.ui.read.forEach(function (id) {
+        if (typeof id === 'string' && /^[a-z0-9-]{1,40}$/.test(id) && p.ui.read.indexOf(id) === -1) p.ui.read.push(id);
       });
     }
 
@@ -537,6 +544,11 @@
       return types;
     }
 
+    // 研究中心訊息：打開過這個聊天對象，之後不再顯示未讀數字
+    function markRead(id) {
+      return update(function (p) { if (p.ui.read.indexOf(id) === -1) p.ui.read.push(id); });
+    }
+
     // 神奇眼藥水：on 為 true 時所有網站都不顯示眼疾效果（js/effects.js 讀這個值）
     function setEyedrops(on) {
       return update(function (p) { p.ui.eyedrops = !!on; });
@@ -564,6 +576,7 @@
       openLock: openLock,
       takeNewUnlocks: takeNewUnlocks,
       takeNewEffects: takeNewEffects,
+      markRead: markRead,
       setEyedrops: setEyedrops,
       reset: reset
     };

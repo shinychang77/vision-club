@@ -2,6 +2,8 @@
    設定上是研究中心的人偷偷架在中心網址底下的，所以版面是研究中心網站的翻版（頁首、導覽列、主視覺、頁尾），換成燭光的顏色：
    暖黑底、燭火的橘光、泛黃的照片。整頁蓋一層暗，只有滑鼠周圍一圈是亮的（.fs-dark，位置由 fellowship.js 更新）。
    眼疾效果的樣式沿用 ../site.css，疊在燭光上面 */
+:root { color-scheme: only dark; } /* 頁面本來就是暗的：宣告成深色，瀏覽器的強制深色就不會再動它，捲軸也是深色 */
+:root:has(body.fs-missing) { color-scheme: only light; } /* 沒暗號時偽裝成白底的「找不到頁面」，捲軸也要是淺色 */
 body.fellowship {
   --fs-ink: #e9dcc4; --fs-muted: #b39d7a; --fs-gold: #f1c27d; --fs-amber: #e0a85c; --fs-line: #4a3826;
   margin: 0; background: #120c08; color: var(--fs-ink);
@@ -51,7 +53,22 @@ body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; righ
 .fs-search input { flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid var(--fs-line); background: #1c140e; color: inherit; font: inherit; }
 .fs-search button { padding: 8px 20px; border: 1px solid var(--fs-amber); background: transparent; color: var(--fs-amber); font: inherit; cursor: pointer; }
 .fs-search button:hover { background: rgba(224, 168, 92, .15); }
-.fs-results p, .fs-status { margin: 12px 0 0; }
+.fs-status { margin: 12px 0 0; }
+/* 搜尋結果頁 */
+.fs-wrap > .fs-results { max-width: 800px; margin: 20px auto 0; padding: 0; list-style: none; }
+.fs-results li { padding: 12px 0; border-bottom: 1px solid var(--fs-line); }
+/* 人物頁：像社群網站的個人頁 */
+.fs-person { max-width: 560px; margin: 0 auto; text-align: center; }
+.fs-avatar { display: block; width: 120px; height: 120px; margin: 8px auto 16px; border: 2px solid var(--fs-line); border-radius: 50%; object-fit: cover; filter: sepia(.3); }
+.fs-presence { color: var(--fs-muted); font-size: 14px; }
+.fs-presence.is-online { color: #8fcf7a; }
+.fs-dot { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: #6b6259; vertical-align: .05em; }
+.is-online .fs-dot { background: #5bd04a; box-shadow: 0 0 6px #5bd04a; }
+.fs-joined { color: var(--fs-muted); font-size: 13px; }
+.fs-join-button { padding: 6px 28px; border: 1px solid var(--fs-amber); border-radius: 999px; background: transparent; color: var(--fs-amber); font: inherit; cursor: pointer; }
+.fs-join-button:hover { background: rgba(224, 168, 92, .15); }
+.fs-join .fs-status { min-height: 1.6em; color: #e2735a; font-size: 14px; }
+.fs-bio { margin: 24px 0; padding: 20px 24px; border: 1px solid var(--fs-line); border-radius: 12px; background: rgba(224, 168, 92, .04); }
 .fs-status { min-height: 2em; color: #e2735a; }
 .fs-wrap a, .fs-top a { color: var(--fs-amber); }
 /* 找人：頁首右邊 */

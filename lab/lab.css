@@ -1,5 +1,6 @@
 /* 研究單位網站：2026-11-21 改版成正式機構的官網。版面是「醫院品牌」型（白色頁首、左文右圖的主視覺、卡片、深色頁尾），
    配色是「北歐柔和」（米白、霧藍、米色、灰綠）。風格範例見 dev/lab-styles.html，標誌見 assets/society/logo.svg */
+:root { color-scheme: only light; } /* 不讓瀏覽器的強制深色把頁面變暗（深色模式的線索是讀系統設定，不受影響） */
 :root {
   --lab-bg: #f7f5f0; --lab-paper: #fff; --lab-ink: #3b4148; --lab-muted: #7d848c; --lab-line: #e4e0d7;
   --lab-main: #3e5e75; --lab-soft: #6b8fa8; --lab-mist: #dfe8ee; --lab-sand: #f1e9df; --lab-sage: #e3ece4;
@@ -122,6 +123,9 @@ a { color: var(--lab-main); }
 .lab-search .lab-button { margin-top: 0; padding: 6px 16px; font-size: 14px; }
 .lab-search .lab-status { min-height: 0; margin: 0; color: var(--lab-muted); font-size: 12px; }
 .lab-search .lab-status a { font-size: 13px; }
+.lab-results { margin: 16px 0 24px; padding: 0; list-style: none; }
+.lab-results li { padding: 12px 0; border-bottom: 1px solid var(--lab-line); }
+.lab-results small { display: block; color: var(--lab-muted); font-size: 13px; }
 .lab-button:disabled { opacity: .5; cursor: not-allowed; }
 /* 訊息：內部訊息系統的對話串（頭像、名字、時間，一則一列） */
 .lab-messenger { display: grid; grid-template-columns: 280px minmax(0, 1fr); margin: 16px 0 32px; overflow: hidden; border: 1px solid var(--lab-line); border-radius: 6px; background: var(--lab-paper); }
@@ -144,9 +148,12 @@ a { color: var(--lab-main); }
 .lab-thread-head { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--lab-line); background: var(--lab-bg); font-size: 14px; }
 .lab-tag { padding: 0 8px; border: 1px solid #c9a36b; border-radius: 3px; color: #8a6420; font-size: 12px; }
 .lab-main .lab-chat { margin: 0; padding: 6px 0; list-style: none; }
-.lab-chat li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 0 12px; padding: 8px 16px; }
-.lab-chat li:hover { background: var(--lab-bg); }
-.lab-chat p { grid-column: 2; margin: 0; }
+/* 左右對話：對方靠左（頭像＋灰泡泡），自己靠右（藍泡泡），時間貼在泡泡旁邊 */
+.lab-chat li { display: flex; align-items: flex-end; gap: 8px; padding: 5px 16px; }
+.lab-chat li.is-me { flex-direction: row-reverse; }
+.lab-chat .lab-bubble { max-width: 68%; margin: 0; padding: 8px 14px; border-radius: 16px 16px 16px 4px; background: var(--lab-mist); white-space: pre-line; }
+.lab-chat li.is-me .lab-bubble { border-radius: 16px 16px 4px 16px; background: var(--lab-main); color: #fff; }
+.lab-chat-time { flex: none; color: var(--lab-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .lab-avatar { grid-row: span 2; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 4px; background: var(--lab-soft); color: #fff; font-size: 14px; font-weight: 700; }
 .lab-chat li.is-me .lab-avatar { background: var(--lab-main); }
 .lab-chat-meta { font-size: 14px; }
@@ -158,7 +165,7 @@ a { color: var(--lab-main); }
   position: fixed; inset: 0; z-index: 2147483600; display: flex; align-items: center; justify-content: center;
   margin: 0; padding: 16px; background: #000; color: rgba(207, 233, 220, .55);
   font-size: 26px; letter-spacing: .6em; text-indent: .6em; text-align: center;
-  animation: lab-glow 4s ease-in both;
+  animation: lab-glow 4s ease-in both; cursor: pointer; /* 點一下收起來 */
 }
 .lab-glow:empty { display: none; }
 @keyframes lab-glow {
@@ -184,6 +191,7 @@ a { color: var(--lab-main); }
 /* 頁尾：深色 */
 .lab-footer { background: #3b4148; color: #c9cdd1; font-size: 13px; }
 .lab-footer .lab-wrap { padding-top: 22px; padding-bottom: 32px; }
+.lab-footer p { margin: 0 0 4px; }
 
 /* 輸入暗號後的過場（lab/lab.js 的 crossToCult）：字散 → 只剩暗號 → 暗號變紅 → 墨滴從搜尋框暈開 */
 .lab-sink { display: inline-block; }
@@ -229,6 +237,7 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 /* 往回縮時樣品的邊緣淡出，雜訊變重，畫質變差 */
 .sem-view.is-out .sem-stage { -webkit-mask-image: radial-gradient(ellipse at center, #000 40%, transparent 70%); mask-image: radial-gradient(ellipse at center, #000 40%, transparent 70%); }
 .sem-view.is-out .sem-noise { opacity: calc(.14 + var(--out, 0) * .22); }
+.sem-eye-layer { position: fixed; z-index: 2147483500; overflow: hidden; pointer-events: none; }
 .sem-eye-text {
   position: absolute; left: 9%; bottom: 9%; margin: 0; pointer-events: none;
   color: #ff4a36; font: 400 26px/1.5 "PMingLiU", "MingLiU", "Times New Roman", serif; letter-spacing: .12em; text-shadow: 2px 2px 0 #000;
@@ -299,6 +308,7 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 .sem-capture:disabled { opacity: .6; cursor: progress; }
 .sem-status { min-height: 1.6em; margin: 8px 0 0; font-size: 13px; }
 .sem-status.is-red { color: #b21700; font-size: 15px; font-weight: 700; letter-spacing: .05em; }
+.sem-status-layer { position: fixed; z-index: 2147483500; margin: 0; pointer-events: none; color: #e01b00; font: 700 15px/1.6 "Microsoft JhengHei", "PingFang TC", sans-serif; letter-spacing: .05em; }
 .sem-album-title { margin: 18px 0 6px; font-size: 14px; }
 .sem-album { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .sem-album img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #000; }
