@@ -206,6 +206,7 @@ details p { margin: 0 0 16px; color: var(--muted); }
 [data-ending="yes"] .ending, [data-ending="no"] .ending { border-color: #000; background: #0c0c0c; color: #f2f0ea; }
 .ending .ending-notice { margin-top: 32px; font-size: 14px; line-height: 1.8; }
 .ending a { color: inherit; }
+.ending .button-secondary { color: var(--brand); } /* 返回鍵：上一行會把字變成和黑底一樣的白，按鈕底是白的就看不清 */
 .ending-letter { margin: 8px 0 24px; }
 .txt { white-space: pre-wrap; } /* 一整格的內文：保留換行和連續空格（EyeDom.paras） */
 .ending-letter .ending-eyedrops { vertical-align: middle; }

@@ -61,7 +61,7 @@
       const n = Number(g.replace(/[^\d]/g, '')) || 0;
       return g[0] === '×' ? (c) => c * n : /^[−-]/.test(g) ? (c) => c - n : (c) => c + n;
     };
-    let count = 6;
+    let count = 3;      // 起始 3 人，配上 content.js 的三道門，最多剛好 20 人（3→6→10→20），不會被上限吃掉
     let lat = 0;        // 小人在跑道上的左右位置（−90～90，0 是正中間）
     let want = 0;       // 滑鼠指的左右位置
     let started = 0;

@@ -280,8 +280,8 @@ var EYE_CONTENT = {
       after: 'q9',
       prompt: '你想成為使者嗎？',
       options: [
-        { id: 'a', text: '想', anomaly: 0 },
-        { id: 'b', text: '不想', anomaly: 1 }
+        { id: 'a', text: '想', anomaly: 1 },
+        { id: 'b', text: '不想', anomaly: 0 }
       ]
     },
     {
@@ -1054,7 +1054,7 @@ var EYE_CONTENT = {
     label: '廣告・零號互動',
     close: '關閉廣告',
     // runner.gates：三道門，每道左右兩扇；小人從 6 個開始，最少 1 個、最多 20 個
-    runner: { level: '第 27413 關', hint: '只有 1% 的人過得了！', gates: [['+5', '×2'], ['−3', '+4'], ['×2', '−5']], installs: '下載數 5000 萬+　★★★★☆' },
+    runner: { level: '第 27413 關', hint: '只有 1% 的人過得了！', gates: [['+3', '×2'], ['−2', '+4'], ['×2', '−3']], installs: '下載數 5000 萬+　★★★★☆' },
     granny: { title: '阿嬤看不見了！', question: '你會怎麼幫她？', options: ['眼藥水', '墨鏡'], installs: '下載數 1997 萬+　★★★★★',
       image: 'assets/horizon/ad-granny.jpg', alt: '3D 卡通風格的阿嬤閉著眼睛、一臉委屈地坐在破舊的房間裡，窗戶貼滿報紙，地上倒著水桶。' }
   },
@@ -1158,7 +1158,7 @@ var EYE_CONTENT = {
       { requires: 'cult-file', type: 'macular' },   // 在教團網站用色盲圖的數字打開成員留下的文件
       { requires: 'cult-site', type: 'glaucoma' }   // 在研究單位網站輸入兩句暗號、進入教團網站
     ],
-    strength: { cataract: 0.6, glaucoma: 1, macular: 1, colorblind: 1 },
+    strength: { cataract: 0.45, glaucoma: 0.75, macular: 0.8, colorblind: 1 },
     toast: '{name} {n}/{total}',
     names: { cataract: 'cataract', glaucoma: 'glaucoma', macular: 'macular degeneration', colorblind: 'dyschromatopsia' },
     // 測試用：每一頁左下角出現「清除眼疾效果」的按鈕。上線前把這一行刪掉，按鈕就不會出現
