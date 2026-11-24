@@ -36,7 +36,15 @@
     glow.classList.toggle('is-shown', show);
   }
   glow.addEventListener('click', () => { dismissed = true; applyDim(); });
-  dark.addEventListener('change', () => { dismissed = false; applyDim(); });
+  dark.addEventListener('change', () => { dismissed = false; applyDim(); showSky(); });
+  // 標誌旁的太陽／月亮：只顯示網頁讀到的是淺色還是深色，不能按。玩家切了系統設定、瀏覽器卻沒跟上時，看得出網站沒收到
+  const sky = document.getElementById('lab-sky');
+  function showSky() {
+    sky.innerHTML = dark.matches
+      ? '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  }
+  if (sky) showSky();
   document.documentElement.append(glow); // 掛在 <body> 外面：眼疾效果會在 body 加濾鏡，裡面的 fixed 元素就不會貼著螢幕了
   document.getElementById('lab-footer').replaceChildren(el('p', { text: H.footer }), H.phone ? el('p', { text: H.phone }) : '');
 

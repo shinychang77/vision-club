@@ -118,6 +118,7 @@ a { color: var(--lab-main); }
 .lab-status { min-height: 1.6em; margin: 8px 0 0; color: #a3473a; font-size: 14px; }
 /* 站內搜尋：固定在頁首右上角 */
 .lab-header-search { margin-left: auto; }
+.lab-sky { display: inline-flex; margin-left: -8px; color: var(--lab-ink); opacity: .55; pointer-events: none; }
 .lab-search { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 8px; }
 .lab-search input { width: 190px; min-width: 0; padding: 6px 14px; border: 1px solid var(--lab-line); border-radius: 999px; background: var(--lab-bg); font: inherit; font-size: 14px; }
 .lab-search .lab-button { margin-top: 0; padding: 6px 16px; font-size: 14px; }
