@@ -97,12 +97,12 @@ if (siteSearch) {
 }
 document.addEventListener('DOMContentLoaded', () => {
   const text = window.EYE_CONTENT && window.EYE_CONTENT.credit;
-  const foot = document.querySelector('.site-footer .footer-inner, #lab-footer, #fs-foot');
+  const foot = document.querySelector('.site-footer, .lab-footer, .fs-foot');
   if (!text || !foot) return;
   const p = document.createElement('p');
   p.className = 'site-credit';
   p.textContent = text;
-  p.setAttribute('style', 'margin:8px 0 0;font-size:12px;opacity:.65;');
+  p.setAttribute('style', 'margin:0;padding:0 12px 6px;text-align:right;font-size:11px;opacity:.5;');
   foot.append(p);
 });
 document.addEventListener('DOMContentLoaded', () => {
