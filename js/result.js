@@ -1,4 +1,3 @@
-// 結果頁：結果卡（canvas 畫的一張圖，畫面顯示和下載 PNG 共用）與分享文字。文案與欄位設定在 content.js 的 result
 (function () {
   const C = window.EYE_CONTENT;
   const P = window.EyeProgress;
@@ -7,10 +6,8 @@
   const app = document.getElementById('result-app');
   if (!C || !P || !app) return;
   const R = C.result;
-
   document.getElementById('page-title').textContent = R.title;
   const progress = P.load();
-
   if (!L.isNormalComplete(progress, C)) {
     app.replaceChildren(el('div', { class: 'panel' }, [
       el('p', { text: R.incompleteText }),
@@ -18,23 +15,16 @@
     ]));
     return;
   }
-
-  // ---- 結局 ----
-  // 主線的異常題全選了異常答案：不出結果卡，改出最後的警告和最後一題（文字在 content.js 的 ending）。
-  // 選了就看到對應的結局；按「返回」或瀏覽器的上一頁回到題目，可以改選另一個。選了什麼不會存起來
   if (C.ending && L.endingReady(progress, C)) {
     const E = C.ending;
-    // 警告一句一個錯誤視窗：遇到 。？！ 或換行就切成一句
     const lines = String(E.warning).split(/\n+/).flatMap((p) => p.match(/[^。？！?!]+[。？！?!]*/g) || []).map((s) => s.trim()).filter(Boolean);
-    let warned = false; // 這一頁只跳一輪；按「返回」回到題目時不再跳
+    let warned = false;
     const show = () => {
       const key = location.hash === '#yes' ? 'yes' : location.hash === '#no' ? 'no' : '';
       const end = E.endings[key];
       document.body.dataset.ending = key;
-      if (end && E.event) window.EyeProgress.addEvent(E.event); // 看過結局＝通關，解開通關後的彩蛋
-      // 選「是」的結局：眼疾效果在這一頁暫時消失；離開這一頁就恢復
+      if (end && E.event) window.EyeProgress.addEvent(E.event);
       if (window.EyeEffects) { if (key === 'yes') window.EyeEffects.apply([]); else window.EyeEffects.refresh(); }
-      // 第一次來：先一個一個跳錯誤視窗，全部按掉才出現最後一題
       if (!end && !warned) { warned = true; app.replaceChildren(); popups(lines, show); return; }
       app.replaceChildren(el('div', { class: 'panel ending' }, end ? [
         el('h2', { text: end.title }),
@@ -44,7 +34,6 @@
       ] : [
         el('h2', { text: E.question }),
         el('div', { class: 'actions' }, [
-          // 「是」留在眼睛這邊（紅色），「否」走向另一邊（點狀）
           el('a', { class: 'button', href: '#yes', text: E.yes }), window.EyeDom.arrow('red'),
           el('a', { class: 'button', href: '#no', text: E.no }), window.EyeDom.arrow('dots')
         ])
@@ -55,8 +44,6 @@
     show();
     return;
   }
-
-  // 錯誤視窗：一次一個，按「確定」換下一句，每個稍微錯開一點。掛在 <html> 底下，眼疾效果蓋不到。全部按完呼叫 done
   function popups(list, done) {
     const E = C.ending;
     const shade = el('div', { class: 'ending-shade' });
@@ -76,8 +63,6 @@
     };
     next();
   }
-
-  // 結局內文下方：注意事項＋彩蛋入口、0 號使者的話（點了展開）、神奇眼藥水（切換眼疾效果）。end.noLetter 的結局沒有 0 號使者的話
   function afterEnding(A, end) {
     const drops = el('button', { type: 'button', class: 'button button-small ending-eyedrops' });
     const paint = () => {
@@ -93,12 +78,9 @@
     paint();
     return [
       el('p', { class: 'ending-notice' }, [A.notice + ' ', el('a', { href: A.link.href, text: A.link.text })]),
-      // 眼藥水放在 0 號使者的話裡面：點開「來自 0 號使者」才看得到，接在第一個 >> 的右邊
       end.noLetter ? null : el('details', { class: 'ending-letter' }, [el('summary', { text: A.from }), ...letterParagraphs(A.letter, drops)])
     ];
   }
-
-  // 0 號使者的話：按鈕插在第一個 >> 後面，沒有 >> 就放在最後
   function letterParagraphs(text, button) {
     let placed = false;
     const out = String(text).split(/\n[ \t\u3000]*\n/).map((para) => {
@@ -106,13 +88,10 @@
       if (!m) return el('p', { class: 'txt', text: para });
       placed = true;
       const cut = m.index + m[0].length;
-      // >> 和按鈕包在一起不斷行，按鈕才一定在 >> 右邊
       return el('p', { class: 'txt' }, [para.slice(0, m.index), el('span', { class: 'ending-drops-line' }, [m[0] + ' ', button]), para.slice(cut)]);
     });
     return placed ? out : out.concat(button);
   }
-
-  // ---- 欄位內容 ----
   const percent = L.scorePercent(progress, C);
   const level = R.levels.find((l) => percent >= l.minPercent) || R.levels[R.levels.length - 1];
   const type = R.types[L.resultType(progress, C)];
@@ -128,18 +107,12 @@
     date: L.isoToDots(L.todayISO()),
     subjectId: progress.subjectId
   };
-  // 解鎖任一異常題後，指定欄位變成雜訊
-  // 支線題不算：只有主線的異常題解鎖了，欄位才會變成雜訊
   const noisy = L.unlockCount(progress, C).n > 0 && R.noise && R.noise.field;
   if (noisy) values[R.noise.field] = noiseText(progress.subjectId + progress.unlocked.join(','), R.noise.chars, R.noise.length);
-
   const fields = R.cardFields.map((f) => ({ key: f.key, label: f.label, value: values[f.key], noise: noisy === f.key }));
-  // 理智值、類型、理智狀態（印章）畫在卡片上半部，其他欄位排在下方
   const heroKeys = ['score', 'type', 'level'];
   const hero = Object.fromEntries(fields.filter((f) => heroKeys.includes(f.key)).map((f) => [f.key, f]));
   const rows = fields.filter((f) => !heroKeys.includes(f.key));
-
-  // ---- 畫面 ----
   const pending = L.pendingAnomalies(progress, C);
   const card = drawCard();
   card.className = 'result-card';
@@ -150,7 +123,6 @@
   const textBox = el('textarea', { class: 'share-text', rows: 3, readonly: true, 'aria-label': R.shareTextLabel });
   textBox.value = shareText;
   const status = el('p', { class: 'form-status', role: 'status' });
-
   app.replaceChildren(...[
     pending.length ? el('p', { class: 'hint', 'data-pending': pending.length }, [
       L.format(R.pendingHint, { n: pending.length }) + ' ',
@@ -170,8 +142,6 @@
       status
     ])
   ].filter(Boolean));
-
-  // 同一個種子永遠產生同一串雜訊
   function noiseText(seed, chars, length) {
     let h = 2166136261;
     for (let i = 0; i < seed.length; i++) h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
@@ -183,8 +153,6 @@
     }
     return out;
   }
-
-  // 系統的分享選單：能附檔就附上結果卡圖片；不能分享（多半是電腦版瀏覽器）就改成複製文字
   async function share() {
     if (!navigator.share) return copyText();
     const data = { text: shareText };
@@ -194,17 +162,15 @@
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) data.files = [file];
       await navigator.share(data);
     } catch (e) {
-      if (e && e.name === 'AbortError') return; // 玩家自己按了取消
+      if (e && e.name === 'AbortError') return;
       copyText();
     }
   }
-
   async function copyText() {
     try {
       await navigator.clipboard.writeText(shareText);
       status.textContent = R.copyDone;
     } catch (e) {
-      // 剪貼簿 API 不能用時（例如部分瀏覽器開本機檔案），改用選取＋複製
       textBox.focus();
       textBox.select();
       let ok = false;
@@ -212,8 +178,6 @@
       status.textContent = ok ? R.copyDone : R.copyFail;
     }
   }
-
-  // ---- canvas 繪製結果卡（1080×1350，社群直式分享圖比例） ----
   function drawCard() {
     const W = 1080;
     const H = 1350;
@@ -228,16 +192,13 @@
     const muted = color('--muted', '#5b6b74');
     const line = color('--line', '#d8e0e3');
     const tint = color('--tint', '#f2f6f6');
-    const accent = '#ffd84d'; // 螢光筆黃，只用在結果卡
+    const accent = '#ffd84d';
     const fontFamily = getComputedStyle(document.body).fontFamily;
     const font = (weight, size) => `${weight} ${size}px ${fontFamily}`;
     const box = (x, y, w, h, r, fill) => { ctx.fillStyle = fill; roundRect(ctx, x, y, w, h, r); ctx.fill(); };
-
     ctx.fillStyle = brand;
     ctx.fillRect(0, 0, W, H);
     box(40, 40, W - 80, H - 80, 32, '#ffffff');
-
-    // 頁首
     drawEye(ctx, 130, 122, 1.7, brand, ink);
     ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'left';
@@ -247,8 +208,6 @@
     ctx.fillStyle = muted;
     ctx.font = font(400, 26);
     ctx.fillText(R.cardSubtitle, 190, 158);
-
-    // 理智值區塊：大數字＋十格量表，右邊蓋理智狀態的印章
     box(90, 190, 900, 330, 28, brand);
     ctx.save();
     roundRect(ctx, 90, 190, 900, 330, 28);
@@ -291,8 +250,6 @@
       else { ctx.fillStyle = accent; ctx.fillText(hero.level.value, 0, 4); }
       ctx.restore();
     }
-
-    // 類型：名稱畫螢光筆，下面是台詞、說明、標籤
     let y = 600;
     ctx.textAlign = 'center';
     ctx.fillStyle = muted;
@@ -319,8 +276,6 @@
     ctx.fillStyle = muted;
     ctx.font = font(400, 31);
     wrapLines(ctx, type.text, W - 240).slice(0, 3).forEach((text) => { y += 46; ctx.fillText(text, W / 2, y); });
-
-    // 標籤：一排膠囊，放不下的省略
     y += 34;
     ctx.font = font(700, 28);
     ctx.textBaseline = 'middle';
@@ -340,8 +295,6 @@
       x += t.width + 14;
     });
     ctx.textBaseline = 'alphabetic';
-
-    // 其他欄位：兩欄小字，從底部往上排
     const top = 1237 - Math.ceil(rows.length / 2) * 76;
     ctx.strokeStyle = line;
     ctx.lineWidth = 2;
@@ -359,13 +312,10 @@
       if (f.noise) drawNoise(ctx, f.value, cx, cy + 62, font(700, 30), muted);
       else { ctx.fillStyle = ink; ctx.font = font(700, 30); ctx.fillText(f.value, cx, cy + 62, 410); }
     });
-
     ctx.textAlign = 'center';
     ctx.fillStyle = brand;
     ctx.font = font(700, 28);
     ctx.fillText(R.cardCta + '　' + R.shareUrl, W / 2, 1282);
-
-    // 年紀越小整張越暗（設定在 content.js 的 result.dimBelowAge、dimPerYear）
     const dim = age === null ? 0 : Math.max(0, (R.dimBelowAge || 0) - age) * (R.dimPerYear || 0);
     if (dim > 0) {
       ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(dim, 1)})`;
@@ -373,7 +323,6 @@
     }
     return canvas;
   }
-
   function drawNoise(ctx, text, x, y, fontSpec, base) {
     ctx.font = fontSpec;
     ctx.globalAlpha = 0.55;
@@ -385,12 +334,10 @@
     ctx.fillStyle = base;
     ctx.fillText(text, x, y);
   }
-
   function drawEye(ctx, cx, cy, s, brand, ink) {
     ctx.save();
     ctx.translate(cx - 24 * s, cy - 24 * s);
     ctx.scale(s, s);
-    // 刻度環與虹膜纖維：把圓周平均切成 count 段，每段只畫 ratio 的比例
     const dashedRing = (r, width, count, ratio, color) => {
       const step = 2 * Math.PI * r / count;
       ctx.save();
@@ -408,7 +355,6 @@
       ctx.arc(x, y, r, 0, Math.PI * 2);
       ctx.fill();
     };
-
     dashedRing(22.5, 2.4, 60, 0.34, brand);
     const eye = new Path2D(window.EyeLogo.shape);
     ctx.fillStyle = '#ffffff';
@@ -429,7 +375,6 @@
     ctx.fill(new Path2D(window.EyeLogo.lid));
     ctx.restore();
   }
-
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -439,8 +384,6 @@
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
   }
-
-  // 中文沒有空格可斷行，逐字累加到超過寬度就換行
   function wrapLines(ctx, text, maxWidth) {
     const lines = [];
     let current = '';
@@ -451,7 +394,6 @@
     if (current) lines.push(current);
     return lines;
   }
-
   function downloadPng() {
     const canvas = card;
     const save = (href, done) => {

@@ -1,7 +1,5 @@
-// 眼球 Logo：全站只在這裡定義。頁面放 <span class="logo" data-logo> 就會自動填入
 const EYE_SHAPE = 'M5 24 C12 13.5 18 11.5 24 11.5 C30 11.5 36 13.5 43 24 C36 34.5 30 36.5 24 36.5 C18 36.5 12 34.5 5 24 Z';
 const EYE_LID = 'M3 24 C11 12 18 9 24 9 C30 9 37 12 45 24 C36 13.5 30 11.5 24 11.5 C18 11.5 12 13.5 3 24 Z';
-
 function mountLogo(node) {
   node.innerHTML = `<svg viewBox="0 0 48 48" aria-hidden="true">
     <defs><clipPath id="eye-clip"><path d="${EYE_SHAPE}"/></clipPath></defs>
@@ -20,18 +18,13 @@ function mountLogo(node) {
   </svg>`;
   return node;
 }
-
 window.EyeLogo = { shape: EYE_SHAPE, lid: EYE_LID, mount: mountLogo };
 document.querySelectorAll('[data-logo]').forEach(mountLogo);
-
-// 眼球 Logo 跟著游標看
 const logo = document.querySelector('.site-header .logo');
 const pupil = logo && logo.querySelector('.logo-pupil');
-// 瞳孔偏離中心的上限（SVG 單位）。眼睛扁長，上下空間比左右小很多
 const MAX_X = 8;
 const MAX_Y = 2;
-const EASE_DISTANCE = 160; // 游標距離小於此值（px）時，瞳孔偏移會按比例縮小
-
+const EASE_DISTANCE = 160;
 if (logo && pupil) {
   window.addEventListener('pointermove', (event) => {
     const box = logo.getBoundingClientRect();
@@ -42,8 +35,6 @@ if (logo && pupil) {
     pupil.setAttribute('transform', `translate(${dx / distance * shift * MAX_X} ${dy / distance * shift * MAX_Y})`);
   });
 }
-
-// 各頁面腳本共用的小工具：建立元素。文字一律用 textContent，不會被當成 HTML
 window.EyeDom = {
   el(tag, attrs, children) {
     const node = document.createElement(tag);
@@ -60,17 +51,12 @@ window.EyeDom = {
     });
     return node;
   },
-  // 一整格內文 → 一段一段的 <p>：空一行是新的一段，只換行就是段落裡換行（.txt 保留換行和連續空格）
   paras(text, cls) {
     return String(text || '').split(/\n[ \t　]*\n/).map((t) => window.EyeDom.el('p', { class: cls ? cls + ' txt' : 'txt' }, window.EyeDom.rich(t)));
   },
-  // 文字裡用 [[ ]] 包起來的字畫成紅字：指 OPHANIM（眼睛）的「祂」「祂們」，讓玩家分得出是哪一方。回傳一串可以直接放進元素的子節點
   rich(text) {
     return String(text || '').split(/\[\[(.+?)\]\]/).map((part, i) => (i % 2 ? window.EyeDom.el('span', { class: 'oph', text: part }) : part)).filter((x) => x !== '');
   },
-  // 指向選項的箭頭，代表兩股勢力：'dots' 點狀的、'red' 紅色的。只在玩家從使者專區的彈窗過來之後出現。
-  // 眼疾效果的濾鏡套在 <body> 上，所以真正看得到的箭頭畫在 <body> 外面、蓋在效果上面，不受影響（眼睛最後的掙扎）；
-  // 頁面裡只留一個看不見的佔位，每一格畫面把箭頭對齊到佔位的位置。佔位被拿掉，箭頭也跟著拿掉
   arrow(kind) {
     const make = () => {
       const node = document.createElement('span');
@@ -90,7 +76,6 @@ window.EyeDom = {
     return slot;
   }
 };
-
 const floatingArrows = [];
 function syncArrows() {
   for (let i = floatingArrows.length - 1; i >= 0; i--) {
@@ -101,10 +86,6 @@ function syncArrows() {
   }
   if (floatingArrows.length) requestAnimationFrame(syncArrows);
 }
-
-// 頁首右上角的站內搜尋：視界的每一頁都有。送出後到知識庫頁顯示結果；
-// 人已經在知識庫頁的話，由 js/wiki.js 直接接手（window.EyeSiteSearch），不換頁。
-// 關鍵字放在 # 後面帶過去，不會送到伺服器
 const siteSearch = document.getElementById('site-search');
 if (siteSearch) {
   siteSearch.addEventListener('submit', (event) => {
@@ -114,3 +95,53 @@ if (siteSearch) {
     else if (q) location.href = 'wiki.html#q=' + encodeURIComponent(q);
   });
 }
+document.addEventListener('DOMContentLoaded', () => {
+  const text = window.EYE_CONTENT && window.EYE_CONTENT.credit;
+  const foot = document.querySelector('.site-footer .footer-inner, #lab-footer, #fs-foot');
+  if (!text || !foot) return;
+  const p = document.createElement('p');
+  p.className = 'site-credit';
+  p.textContent = text;
+  p.setAttribute('style', 'margin:8px 0 0;font-size:12px;opacity:.65;');
+  foot.append(p);
+});
+document.addEventListener('DOMContentLoaded', () => {
+  const T = window.EYE_CONTENT && window.EYE_CONTENT.mobileNotice;
+  if (!T) return;
+  const ua = navigator.userAgent;
+  const mobile = (navigator.userAgentData && navigator.userAgentData.mobile) ||
+    /Android|iPhone|iPad|iPod|Mobile/i.test(ua) ||
+    (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ||
+    (matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches);
+  if (!mobile) return;
+  try { if (localStorage.getItem('eye:mobile-notice')) return; } catch (e) {   }
+  const shade = document.createElement('div');
+  shade.setAttribute('style', 'position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.45);');
+  const box = document.createElement('div');
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  box.setAttribute('aria-label', T.title);
+  box.setAttribute('style', 'width:min(360px,100%);padding:22px 20px 16px;border-radius:12px;background:#fff;color:#1f2328;box-shadow:0 8px 32px rgba(0,0,0,.3);font:15px/1.7 "Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;text-align:center;');
+  const h = document.createElement('p');
+  h.textContent = T.title;
+  h.setAttribute('style', 'margin:0 0 8px;font-size:18px;font-weight:700;');
+  box.append(h);
+  T.text.split('\n').forEach((line) => {
+    const p = document.createElement('p');
+    p.textContent = line;
+    p.setAttribute('style', 'margin:0 0 6px;text-align:left;');
+    box.append(p);
+  });
+  const ok = document.createElement('button');
+  ok.type = 'button';
+  ok.textContent = T.ok;
+  ok.setAttribute('style', 'margin-top:10px;padding:8px 28px;border:0;border-radius:999px;background:#17606b;color:#fff;font:inherit;cursor:pointer;');
+  ok.addEventListener('click', () => {
+    try { localStorage.setItem('eye:mobile-notice', '1'); } catch (e) {   }
+    shade.remove();
+  });
+  box.append(ok);
+  shade.append(box);
+  document.documentElement.append(shade);
+  ok.focus();
+});

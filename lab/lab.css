@@ -1,6 +1,4 @@
-/* 研究單位網站：2026-11-21 改版成正式機構的官網。版面是「醫院品牌」型（白色頁首、左文右圖的主視覺、卡片、深色頁尾），
-   配色是「北歐柔和」（米白、霧藍、米色、灰綠）。風格範例見 dev/lab-styles.html，標誌見 assets/society/logo.svg */
-:root { color-scheme: only light; } /* 不讓瀏覽器的強制深色把頁面變暗（深色模式的線索是讀系統設定，不受影響） */
+:root { color-scheme: only light; }
 :root {
   --lab-bg: #f7f5f0; --lab-paper: #fff; --lab-ink: #3b4148; --lab-muted: #7d848c; --lab-line: #e4e0d7;
   --lab-main: #3e5e75; --lab-soft: #6b8fa8; --lab-mist: #dfe8ee; --lab-sand: #f1e9df; --lab-sage: #e3ece4;
@@ -13,8 +11,6 @@ body {
 }
 a { color: var(--lab-main); }
 .lab-wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
-
-/* 頁首：白底，標誌＋名稱在左，搜尋在右 */
 .lab-header { background: var(--lab-paper); }
 .lab-header .lab-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-top: 16px; padding-bottom: 12px; }
 .lab-name { display: inline-flex; align-items: center; gap: 10px; color: var(--lab-ink); font-size: 19px; font-weight: 700; letter-spacing: .04em; text-decoration: none; }
@@ -23,7 +19,6 @@ a { color: var(--lab-main); }
   -webkit-mask: url(../assets/society/logo.svg) center / contain no-repeat; mask: url(../assets/society/logo.svg) center / contain no-repeat;
 }
 .lab-sub { color: var(--lab-muted); font-size: 14px; }
-/* 回視界網站的連結 */
 .lab-back { padding: 3px 14px; border: 1px solid var(--lab-line); border-radius: 999px; color: var(--lab-muted); font-size: 13px; text-decoration: none; }
 .lab-back:hover { background: var(--lab-mist); color: var(--lab-main); }
 .sem-body .lab-sub + .lab-back { margin-left: auto; }
@@ -33,14 +28,11 @@ a { color: var(--lab-main); }
 .lab-nav a:hover { color: var(--lab-main); }
 .lab-nav a[aria-current="page"] { color: var(--lab-main); font-weight: 700; box-shadow: inset 0 -3px 0 var(--lab-soft); }
 .lab-nav .lab-nav-staff { margin-left: auto; }
-
 .lab-main { padding-top: 40px; padding-bottom: 64px; }
 .lab-main ul { padding-left: 22px; }
 .lab-main h1 { margin: 0 0 16px; color: var(--lab-main); font-size: 30px; line-height: 1.4; letter-spacing: .02em; }
 .lab-main h2 { margin: 40px 0 12px; color: var(--lab-ink); font-size: 21px; }
 .lab-main h2::before { content: ""; display: inline-block; width: 6px; height: 1em; margin-right: 10px; border-radius: 3px; background: var(--lab-soft); vertical-align: -.12em; }
-
-/* 首頁主視覺：左邊文字、右邊一塊圓弧的霧藍色塊 */
 .lab-hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: center; margin: 0 0 8px; padding: 48px; border-radius: 28px; background: var(--lab-mist); }
 .lab-hero h1 { margin-bottom: 18px; font-size: 34px; white-space: pre-line; }
 .lab-hero-kicker { margin: 0 0 6px; color: var(--lab-soft); font-size: 13px; font-weight: 700; letter-spacing: .2em; }
@@ -48,8 +40,6 @@ a { color: var(--lab-main); }
 .lab-hero-art { aspect-ratio: 1 / .85; border-radius: 160px 160px 28px 160px; background: radial-gradient(circle at 50% 42%, #fff 0 9%, transparent 9.5%), linear-gradient(180deg, #b9cddb 0 58%, #8fadc2 58%); }
 .lab-cta { display: inline-block; margin-top: 8px; padding: 10px 26px; border-radius: 999px; background: var(--lab-main); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }
 .lab-cta:hover { background: #2f4a5e; }
-
-/* 研究資源：三張卡片，底色輪流用白、米、灰綠 */
 .lab-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin: 0; padding: 0; list-style: none; }
 .lab-main .lab-cards { padding-left: 0; }
 .lab-cards li { padding: 24px; border-radius: var(--lab-radius); background: var(--lab-paper); box-shadow: 0 6px 20px rgba(60, 80, 100, .07); }
@@ -58,20 +48,14 @@ a { color: var(--lab-main); }
 .lab-cards h3 { margin: 0 0 4px; color: var(--lab-main); font-size: 17px; }
 .lab-cards small { display: block; margin-bottom: 8px; color: var(--lab-muted); font-size: 13px; }
 .lab-cards p { margin: 0; font-size: 15px; }
-
 .lab-table-wrap { overflow-x: auto; border-radius: 12px; background: var(--lab-paper); }
 .lab-table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .lab-table th, .lab-table td { padding: 10px 14px; border-bottom: 1px solid var(--lab-line); text-align: left; }
 .lab-table th { background: var(--lab-mist); color: var(--lab-main); }
-
-/* 最新消息：一列一則，日期是霧藍色 */
 .lab-news { margin: 0; padding: 0; list-style: none; }
 .lab-main .lab-news { padding-left: 0; }
 .lab-news li { display: flex; gap: 20px; padding: 12px 18px; margin-bottom: 8px; border-radius: 12px; background: var(--lab-paper); }
 .lab-news time { flex: none; color: var(--lab-soft); font-weight: 700; font-variant-numeric: tabular-nums; }
-
-/* 員工專區（登入／成員區） */
-/* 加密文件內文的大字（files 的 big）：陳醫師格言 */
 .lab-maxim { margin: 56px 0 64px; text-align: center; }
 .lab-maxim p { margin: 0; font: 700 64px/1.4 "Noto Serif TC", "PMingLiU", serif; letter-spacing: .35em; text-indent: .35em; }
 @media (max-width: 760px) { .lab-maxim p { font-size: 40px; } }
@@ -81,7 +65,6 @@ a { color: var(--lab-main); }
 .lab-member label { display: block; margin-top: 12px; font-size: 14px; font-weight: 700; }
 .lab-member input { width: 100%; padding: 8px 12px; border: 1px solid var(--lab-line); border-radius: 10px; background: var(--lab-bg); font: inherit; }
 .lab-button { margin-top: 16px; padding: 8px 24px; border: 0; border-radius: 999px; background: var(--lab-main); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
-/* 員工入口網：登入頁是置中的一張卡（深色抬頭），登入後上面一條系統列、左邊選單、右邊公告 */
 .lab-login { max-width: 420px; margin: 48px auto; overflow: hidden; border: 1px solid var(--lab-line); border-radius: 8px; background: var(--lab-paper); box-shadow: 0 10px 30px rgba(60, 80, 100, .12); }
 .lab-login-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 24px; background: var(--lab-main); color: #fff; }
 .lab-main .lab-login-head h1 { margin: 0; color: #fff; font-size: 18px; letter-spacing: .08em; }
@@ -116,7 +99,6 @@ a { color: var(--lab-main); }
 .lab-portal-news td:nth-child(2) { width: 5em; color: var(--lab-main); font-weight: 700; }
 @media (max-width: 720px) { .lab-portal { grid-template-columns: 1fr; } }
 .lab-status { min-height: 1.6em; margin: 8px 0 0; color: #a3473a; font-size: 14px; }
-/* 站內搜尋：固定在頁首右上角 */
 .lab-header-search { margin-left: auto; }
 .lab-sky { display: inline-flex; margin-left: -8px; color: var(--lab-ink); opacity: .55; pointer-events: none; }
 .lab-search { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 8px; }
@@ -128,7 +110,6 @@ a { color: var(--lab-main); }
 .lab-results li { padding: 12px 0; border-bottom: 1px solid var(--lab-line); }
 .lab-results small { display: block; color: var(--lab-muted); font-size: 13px; }
 .lab-button:disabled { opacity: .5; cursor: not-allowed; }
-/* 訊息：內部訊息系統的對話串（頭像、名字、時間，一則一列） */
 .lab-messenger { display: grid; grid-template-columns: 280px minmax(0, 1fr); margin: 16px 0 32px; overflow: hidden; border: 1px solid var(--lab-line); border-radius: 6px; background: var(--lab-paper); }
 .lab-main .lab-contacts ul { margin: 0; padding: 0; list-style: none; }
 .lab-contacts { border-right: 1px solid var(--lab-line); background: var(--lab-bg); }
@@ -149,7 +130,6 @@ a { color: var(--lab-main); }
 .lab-thread-head { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--lab-line); background: var(--lab-bg); font-size: 14px; }
 .lab-tag { padding: 0 8px; border: 1px solid #c9a36b; border-radius: 3px; color: #8a6420; font-size: 12px; }
 .lab-main .lab-chat { margin: 0; padding: 6px 0; list-style: none; }
-/* 左右對話：對方靠左（頭像＋灰泡泡），自己靠右（藍泡泡），時間貼在泡泡旁邊 */
 .lab-chat li { display: flex; align-items: flex-end; gap: 8px; padding: 5px 16px; }
 .lab-chat li.is-me { flex-direction: row-reverse; }
 .lab-chat .lab-bubble { max-width: 68%; margin: 0; padding: 8px 14px; border-radius: 16px 16px 16px 4px; background: var(--lab-mist); white-space: pre-line; }
@@ -160,13 +140,11 @@ a { color: var(--lab-main); }
 .lab-chat-meta { font-size: 14px; }
 .lab-chat-meta time { margin-left: 8px; color: var(--lab-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .lab-chat-end { margin: 0; padding: 8px 16px; border-top: 1px solid var(--lab-line); color: var(--lab-muted); font-size: 13px; text-align: center; }
-/* 深色模式的黑幕（lab/lab.js）：首頁整個變黑，中間慢慢浮現半句暗號。
-   網站本身沒有深色版面，深色模式下其他頁照樣是淺色，玩家沒理由一直開著深色模式 */
 .lab-glow {
   position: fixed; inset: 0; z-index: 2147483600; display: flex; align-items: center; justify-content: center;
   margin: 0; padding: 16px; background: #000; color: rgba(207, 233, 220, .55);
   font-size: 26px; letter-spacing: .6em; text-indent: .6em; text-align: center;
-  animation: lab-glow 4s ease-in both; cursor: pointer; /* 點一下收起來 */
+  animation: lab-glow 4s ease-in both; cursor: pointer;
 }
 .lab-glow:empty { display: none; }
 @keyframes lab-glow {
@@ -177,24 +155,18 @@ a { color: var(--lab-main); }
 .lab-braille { font-size: 30px; letter-spacing: .15em; }
 .lab-note-owner { color: var(--lab-muted); font-size: 14px; }
 .lab-note p { margin: 0 0 10px; }
-.lab-figure { max-width: 640px; margin: 24px auto 28px; text-align: center; } /* 圖和圖說都置中 */
+.lab-figure { max-width: 640px; margin: 24px auto 28px; text-align: center; }
 .lab-figure img { display: block; margin: 0 auto; max-width: 100%; max-height: 520px; height: auto; border-radius: 10px; }
 .lab-figure figcaption { margin-top: 6px; color: var(--lab-muted); font-size: 13px; }
-/* 封面：書名和期數疊在留白的封面圖上 */
 .lab-cover { max-width: 300px; }
 .lab-cover img { border-radius: 0; }
 .lab-cover a { position: relative; display: block; color: #7a1f1c; text-decoration: none; }
 .lab-cover-text { position: absolute; top: 44%; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; font-family: "Noto Serif TC", "PMingLiU", serif; font-size: 14px; letter-spacing: .25em; mix-blend-mode: multiply; }
 .lab-cover-text span:first-child { margin-bottom: 8px; font-size: 52px; font-weight: 700; line-height: 1.2; letter-spacing: .3em; text-indent: .3em; }
-/* 印章：蓋在內部文件的標題下面 */
 .lab-stamp { display: inline-block; margin: 0 0 16px; padding: 2px 14px; border: 3px double #b3261e; color: #b3261e; font-size: 20px; font-weight: 700; letter-spacing: .3em; text-indent: .3em; transform: rotate(-4deg); opacity: .85; }
-/* SEM 能量強度紀錄：附件與線上檢視的散佈圖 */
-/* 頁尾：深色 */
 .lab-footer { background: #3b4148; color: #c9cdd1; font-size: 13px; }
 .lab-footer .lab-wrap { padding-top: 22px; padding-bottom: 32px; }
 .lab-footer p { margin: 0 0 4px; }
-
-/* 輸入暗號後的過場（lab/lab.js 的 crossToCult）：字散 → 只剩暗號 → 暗號變紅 → 墨滴從搜尋框暈開 */
 .lab-sink { display: inline-block; }
 .lab-crossing .lab-sink { animation: lab-sink 1.6s ease-in var(--d) forwards; }
 @keyframes lab-sink { to { transform: translateY(60px) rotate(var(--r)); filter: blur(4px); opacity: 0; } }
@@ -206,13 +178,10 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 .lab-cross-ink { position: absolute; inset: 0; filter: url(#lab-rough); }
 .lab-cross-ink i { position: absolute; inset: -60px; background: #4a0d10; clip-path: circle(0 at calc(var(--ix) + 60px) calc(var(--iy) + 60px)); animation: lab-ink 1.6s 3s ease-in forwards; }
 @keyframes lab-ink { 10% { clip-path: circle(18px at calc(var(--ix) + 60px) calc(var(--iy) + 60px)); } 100% { clip-path: circle(160vmax at calc(var(--ix) + 60px) calc(var(--iy) + 60px)); } }
-
-/* SEM 頁：頁首維持深色，和儀器畫面一致 */
 .sem-body .lab-header { background: #1d2024; }
 .sem-body .lab-name, .sem-body .lab-back { color: #e6e6e6; }
 .sem-body .lab-name::before { background: #9fbcd0; }
 .sem-body .lab-sub { color: #9aa3ab; }
-
 @media (max-width: 760px) {
   .lab-wrap { padding-left: 16px; padding-right: 16px; }
   .lab-main h1 { font-size: 24px; }
@@ -220,8 +189,6 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
   .lab-hero-art { display: none; }
   .lab-news li { flex-direction: column; gap: 0; }
 }
-
-/* ---- 模擬 SEM ---- */
 .sem-body { background: #2a2d31; color: #e6e6e6; font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
 .sem-layout { display: grid; grid-template-columns: minmax(240px, 320px) minmax(0, 1fr) 280px; gap: 16px; max-width: 1520px; padding-top: 16px; padding-bottom: 32px; }
 .sem-view {
@@ -232,10 +199,8 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 .sem-optics, .sem-stage { position: absolute; inset: 0; }
 .sem-stage { transform-origin: 0 0; will-change: transform; }
 .sem-surface { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-/* 眼睛：真實照片只留眼型、黑白、半透明，浮在縮小的樣品上。--out 是往回縮的進度 0~1（lab/sem.js 設定） */
 .sem-eye { position: absolute; inset: 6% 12% 14%; opacity: 0; pointer-events: none; transition: transform .6s ease-out; }
 .sem-eye svg { display: block; width: 100%; height: 100%; overflow: visible; filter: grayscale(1) contrast(1.25) brightness(1.05) blur(.6px) drop-shadow(0 0 22px rgba(255, 255, 255, .28)); }
-/* 往回縮時樣品的邊緣淡出，雜訊變重，畫質變差 */
 .sem-view.is-out .sem-stage { -webkit-mask-image: radial-gradient(ellipse at center, #000 40%, transparent 70%); mask-image: radial-gradient(ellipse at center, #000 40%, transparent 70%); }
 .sem-view.is-out .sem-noise { opacity: calc(.14 + var(--out, 0) * .22); }
 .sem-eye-layer { position: fixed; z-index: 2147483500; overflow: hidden; pointer-events: none; }
@@ -252,13 +217,11 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 .sem-denied a { color: #9fc0ea; }
 .sem-mark { position: absolute; }
 .sem-frame { position: absolute; inset: 0; border: 2px solid currentColor; }
-/* 照片邊緣羽化，疊在底圖上才不會像貼上去的一塊 */
 .sem-photo {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse at center, #000 62%, transparent 71%);
   mask-image: radial-gradient(ellipse at center, #000 62%, transparent 71%);
 }
-/* 畫面雜訊：固定在螢幕上、不跟著縮放，模擬掃描影像的顆粒 */
 .sem-noise {
   position: absolute; inset: 0; pointer-events: none; opacity: .14;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -283,17 +246,16 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 }
 .sem-bar { display: inline-flex; align-items: center; gap: 6px; }
 .sem-bar i { display: inline-block; height: 4px; background: #f0f0f0; }
-/* 研究筆記：儀器左邊一張紙，自己捲動，對照著操作 */
 .sem-notes { align-self: start; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; padding: 14px 16px; border-radius: 4px; background: #f2efe8; color: #2b2d30; font-size: 14px; line-height: 1.7; }
 .sem-notes h2 { margin: 0; font-size: 16px; }
 .sem-notes h3 { margin: 16px 0 6px; padding-top: 12px; border-top: 1px solid #d9d4c8; font-size: 14px; }
 .sem-notes .lab-note-owner { margin: 2px 0 0; color: #777; font-size: 12px; }
-.sem-notes .lab-figure { margin: 8px 0 12px; text-align: left; } /* 筆記欄很窄，照舊靠左 */
+.sem-notes .lab-figure { margin: 8px 0 12px; text-align: left; }
 .sem-notes .lab-figure img { border-radius: 2px; }
 .sem-notes figcaption { color: #777; }
 .sem-notes a { color: #1f3a5f; }
 .sem-panel .lab-attachment p { margin: 0 0 6px; font-size: 13px; }
-.sem-panel [inert] { opacity: .45; } /* 連線中斷後不能操作的控制項 */
+.sem-panel [inert] { opacity: .45; }
 .sem-panel { align-self: start; padding: 14px; border-radius: 4px; background: #e9eaec; color: #1d1f22; }
 .sem-help { margin: 0 0 12px; font-size: 13px; color: #444; }
 .sem-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
@@ -315,7 +277,6 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 .sem-album img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #000; }
 .sem-album span { font-size: 12px; }
 .sem-album-empty { grid-column: 1 / -1; color: #666; font-size: 13px; }
-
 @media (max-width: 760px) {
   .lab-wrap { padding-left: 16px; padding-right: 16px; }
   .lab-main h1 { font-size: 22px; }

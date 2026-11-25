@@ -1,6 +1,3 @@
-// 論壇：分區與文章列表、文章內文與留言、登入（內容見 content.js 的 forum）
-// 網址：forum.html 是列表（第一個分區），forum.html#board-分區id 是切到那個分區，forum.html#文章id 是文章，forum.html#login 是登入
-// 玩家沒有自己的帳號，登入只是謎題的鎖：上鎖的文章要用指定帳號登入才看得到
 (function () {
   const C = window.EYE_CONTENT;
   const P = window.EyeProgress;
@@ -10,25 +7,18 @@
   if (!C || !P || !app || !C.forum) return;
   const F = C.forum;
   const T = F.ui;
-
   document.title = `${F.name}｜視界同好會`;
   document.getElementById('page-title').textContent = F.name;
   document.getElementById('page-intro').textContent = F.intro;
   const userBar = document.getElementById('forum-user');
-
   const currentAccount = () => F.accounts.find((a) => a.id === P.load().forum.user) || null;
   const nameOf = (account) => `${account.nickname}（@${account.id}）`;
-  // 從文章回列表時，回到那篇文章所在的分區
   const backLink = (post) => el('p', {}, el('a', { href: post ? '#board-' + post.board : 'forum.html', text: T.back }));
   const countComments = (list) => (list || []).reduce((n, c) => n + 1 + countComments(c.replies), 0);
-
-  // ---- 作者：「暱稱（@帳號）」拆成暱稱與帳號。拆不開的（例如「（帳號不存在）」）整串當名字、頭像是灰色問號 ----
   function parseAuthor(text) {
     const m = /^(.*?)（@([^）]+)）$/.exec(text);
     return m ? { name: m[1], id: m[2] } : { name: text, id: '' };
   }
-
-  // 頭像：暱稱第一個字，底色由帳號決定（同一個人每次都一樣）
   const AVATAR_COLORS = ['#17606b', '#c2571a', '#6b4fa0', '#2f7d4f', '#b0355e', '#3565a8'];
   function avatar(author) {
     const who = parseAuthor(author);
@@ -38,7 +28,6 @@
     node.style.background = AVATAR_COLORS[sum % AVATAR_COLORS.length];
     return node;
   }
-
   function byline(author, isPoster) {
     const who = parseAuthor(author);
     return [
@@ -47,14 +36,12 @@
       isPoster ? el('span', { class: 'badge', text: T.poster }) : null
     ];
   }
-
   function lockIcon() {
     const icon = el('span', { class: 'lock-icon', 'aria-hidden': 'true' });
     icon.innerHTML = '<svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="currentColor"/>' +
       '<path d="M8 10V7.5a4 4 0 0 1 8 0V10" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';
     return icon;
   }
-
   function renderUser() {
     const account = currentAccount();
     userBar.replaceChildren(...(account
@@ -63,12 +50,10 @@
         el('button', { type: 'button', onclick: () => { P.forumLogout(); route(); }, text: T.logout })]
       : [avatar(''), el('span', { text: T.guest }), el('a', { href: '#login', text: T.login })]));
   }
-
   function route() {
     const id = decodeURIComponent(location.hash.slice(1));
     const post = F.posts.find((p) => p.id === id);
     renderUser();
-    // 分區列表：#board-分區 或 #board-分區-頁數
     const m = id.match(/^board-([a-z0-9]+)(?:-(\d+))?$/);
     const board = m && F.boards.find((b) => b.id === m[1]);
     if (!id || board) app.replaceChildren(renderIndex(board || F.boards[0], m && m[2] ? Number(m[2]) : 1));
@@ -77,9 +62,6 @@
     else if (!L.canReadPost(P.load(), post)) app.replaceChildren(renderLocked(post));
     else app.replaceChildren(renderPost(post));
   }
-
-  // 上鎖的文章在列表上只顯示黑框，真正的標題解鎖後才放進頁面
-  // 分區在同一頁用上面的分頁切換，一次只顯示一個分區。文章新的在前面，每頁 T.perPage 篇
   function renderIndex(board, page) {
     const progress = P.load();
     const all = F.posts.filter((p) => p.board === board.id).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
@@ -113,9 +95,7 @@
       ])
     ]);
   }
-
   function renderLocked(post) {
-    // 用密碼鎖的文章：輸入正確的密碼就打開，之後一直開著
     if (post.lock.type === 'code') {
       const code = el('input', { type: 'text', id: 'post-code', autocomplete: 'off', spellcheck: 'false' });
       const status = el('p', { class: 'form-status', role: 'status' });
@@ -130,7 +110,6 @@
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         if (!P.openLock(post.lock, code.value).ok) { status.textContent = T.codeWrong; return; }
-        // 開鎖可能帶來新的眼疾效果，馬上套用
         if (window.EyeEffects) window.EyeEffects.refresh();
         route();
       });
@@ -143,7 +122,6 @@
       backLink(post)
     ]);
   }
-
   function renderPost(post) {
     const board = F.boards.find((b) => b.id === post.board);
     return el('article', { class: 'entry post', 'data-post': post.id }, [
@@ -165,7 +143,6 @@
       backLink(post)
     ]);
   }
-
   function renderBlock(block) {
     switch (block.type) {
       case 'h': return el('h3', { text: block.text });
@@ -180,8 +157,6 @@
       default: return null;
     }
   }
-
-  // 反向色盲圖：每個數字一張（js/plate.js），並排成一列
   function renderPlate(block) {
     if (!window.EyePlate) return null;
     return el('figure', { class: 'plates' }, [
@@ -193,8 +168,6 @@
       el('figcaption', { text: block.caption })
     ]);
   }
-
-  // 留言：第一層標樓層，回覆縮在該則留言裡。發文者本人的留言標「樓主」
   function renderComments(list, post, nested) {
     if (!list || !list.length) return nested ? null : el('p', { class: 'muted', text: T.noComments });
     return el('ol', { class: 'comments' }, list.map((c, i) => el('li', { class: 'comment' }, [
@@ -209,10 +182,8 @@
       ])
     ])));
   }
-
   function renderLogin() {
     if (currentAccount()) return el('div', { class: 'panel' }, [el('p', { text: T.alreadyLoggedIn }), backLink()]);
-    // 密碼欄用一般文字欄：這是遊戲裡的密碼，不要讓瀏覽器跳出「要不要記住密碼」
     const id = el('input', { type: 'text', id: 'forum-id', name: 'forum-id', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
     const password = el('input', { type: 'text', id: 'forum-pw', name: 'forum-pw', autocomplete: 'off', inputmode: 'numeric', maxlength: 8 });
     const status = el('p', { class: 'form-status', role: 'status' });
@@ -232,7 +203,6 @@
     });
     return form;
   }
-
   window.addEventListener('hashchange', () => { route(); window.scrollTo(0, 0); });
   route();
 })();

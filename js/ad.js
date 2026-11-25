@@ -1,13 +1,10 @@
-// 視界首頁的假廣告：設定上是高維存在偷偷塞進網站的干擾，玩起來只是好笑。
-// 待在首頁超過 ads.delay 毫秒，左下角跳出一則（跑酷或阿嬤，隨機一個），點了在原本這一頁跳到 404.html。文字在 content.js 的 ads
 (function () {
   'use strict';
   const C = window.EYE_CONTENT;
   const A = C && C.ads;
   if (!A || !window.EyeDom) return;
   const { el } = window.EyeDom;
-  const go = () => { location.href = '404.html'; }; // 兩則廣告都在原本這一頁跳 404（跑酷撞到大魔王時已經不算玩家剛點擊，開新分頁會被瀏覽器擋）
-
+  const go = () => { location.href = '404.html'; };
   setTimeout(() => {
     const kind = Math.random() < 0.5 ? 'runner' : 'granny';
     const box = el('aside', { class: 'fake-ad', 'aria-label': A.label }, [
@@ -17,7 +14,6 @@
       ]),
       kind === 'runner' ? runner(A.runner) : granny(A.granny)
     ]);
-    // 第一次點廣告（✕ 以外）：從角落放大到畫面中間，之後才能玩；點旁邊的暗處就整個關掉
     const shade = el('div', { class: 'fake-ad-shade', onclick: () => { box.remove(); shade.remove(); } });
     box.addEventListener('click', (event) => {
       if (box.classList.contains('is-big') || event.target.closest('.fake-ad-x')) return;
@@ -29,12 +25,8 @@
       box.classList.add('is-big');
       document.documentElement.append(shade);
     }, true);
-    // 掛在 <body> 外面：眼疾效果會在 body 加濾鏡，裡面的 fixed 元素就不會貼著螢幕角落了
     document.documentElement.append(box);
   }, A.delay);
-
-  // ---- 跑酷：一群膠囊小人往前跑，迎面來三道門（每道左右兩扇加減門），終點是幾個方塊排成的一圈（3D 新手隨手拼的那種）----
-  // 點畫面開始跑；滑鼠（或手指）左右移動決定走哪一扇，小人的數量真的會變（1～20 個）；最後圓環迎面撞上來，就開 404
   const MAX_MEN = 20;
   function runner(R) {
     const stage = el('div', { class: 'fake-ad-stage fake-ad-runner' });
@@ -52,18 +44,18 @@
     </svg>`;
     const svg = stage.querySelector('svg');
     const boss = stage.querySelector('.fa-boss');
-    const rows = [...stage.querySelectorAll('.fa-gates')].reverse(); // 畫的時候遠的先畫，算的時候近的先算
+    const rows = [...stage.querySelectorAll('.fa-gates')].reverse();
     const crowdG = stage.querySelector('.fa-crowd');
     const menG = crowdG.querySelector('.fa-men');
     const countT = crowdG.querySelector('.fa-count');
     const hand = el('span', { class: 'fake-ad-hand', 'aria-hidden': 'true', text: '👆' });
-    const op = (g) => {                   // 門上的字換成算法：+5、×2、−3
+    const op = (g) => {
       const n = Number(g.replace(/[^\d]/g, '')) || 0;
       return g[0] === '×' ? (c) => c * n : /^[−-]/.test(g) ? (c) => c - n : (c) => c + n;
     };
-    let count = 3;      // 起始 3 人，配上 content.js 的三道門，最多剛好 20 人（3→6→10→20），不會被上限吃掉
-    let lat = 0;        // 小人在跑道上的左右位置（−90～90，0 是正中間）
-    let want = 0;       // 滑鼠指的左右位置
+    let count = 3;
+    let lat = 0;
+    let want = 0;
     let started = 0;
     let done = false;
     const crossed = rows.map(() => false);
@@ -73,9 +65,6 @@
       countT.textContent = String(count);
     };
     setCount(count);
-
-    // 鏡頭跟著小人：小人一直在畫面下方，跑道、門、大魔王依「離小人多遠」投影到畫面上。
-    // dz＝物體在小人前方多遠（再加上鏡頭在小人後方 1 的距離），越遠越靠近地平線、越小
     const HORIZON = 44;
     const yAt = (dz) => HORIZON + 144 / dz;
     const sAt = (dz) => 1 / dz;
@@ -83,12 +72,10 @@
       const s = sAt(dz) * (extra || 1);
       g.setAttribute('transform', `translate(140 ${yAt(dz).toFixed(1)}) scale(${s.toFixed(3)})`);
     };
-    const GATE_Z = [3, 5, 7];   // 三道門擺在跑道上的位置
-    const BOSS_Z = 9;           // 大魔王在跑道盡頭
+    const GATE_Z = [3, 5, 7];
+    const BOSS_Z = 9;
     const marksG = stage.querySelector('.fa-marks');
-    let z = 0;                  // 小人跑到哪裡
-
-    // 跑道中線的白線和兩旁的柱子：跟著小人往後退，看起來才像在往前跑
+    let z = 0;
     function drawMarks() {
       let out = '';
       for (let k = Math.floor(z) + 1; k < z + 14; k += 0.7) {
@@ -108,14 +95,12 @@
       drawMarks();
       rows.forEach((row, i) => {
         const dz = GATE_Z[i] - z + 1;
-        row.style.opacity = dz < 0.55 ? '0' : '';   // 已經跑過、到鏡頭後面的門不畫
+        row.style.opacity = dz < 0.55 ? '0' : '';
         if (dz >= 0.55) place(row, dz);
       });
       place(boss, BOSS_Z - z + 1, 3);
       crowdG.setAttribute('transform', `translate(${(140 + lat).toFixed(1)} ${yAt(1)})`);
     }
-
-    // 滑鼠或手指在畫面上的橫向位置，換成跑道上的左右位置
     const toLat = (event) => {
       const r = svg.getBoundingClientRect();
       return Math.max(-90, Math.min(90, (event.clientX - r.left) / r.width * 280 - 140));
@@ -129,20 +114,19 @@
       requestAnimationFrame(tick);
     });
     drawWorld();
-
-    const TOTAL = 4800; // 從起點跑到大魔王要幾毫秒
+    const TOTAL = 4800;
     function tick(now) {
       if (done) return;
       z = Math.min(BOSS_Z, (now - started) / TOTAL * BOSS_Z);
       lat += (want - lat) * 0.12;
       GATE_Z.forEach((gz, i) => {
-        if (crossed[i] || z < gz) return; // 跑到這道門：看在左邊還是右邊那扇
+        if (crossed[i] || z < gz) return;
         crossed[i] = true;
         setCount(op(R.gates[i][lat < 0 ? 0 : 1])(count));
         countT.classList.remove('is-pop'); void countT.getBBox(); countT.classList.add('is-pop');
       });
       drawWorld();
-      if (z >= BOSS_Z) {             // 撞上大魔王：小人消失，同一頁跳 404
+      if (z >= BOSS_Z) {
         done = true;
         crowdG.style.opacity = '0';
         setTimeout(() => { location.href = '404.html'; }, 300);
@@ -150,7 +134,6 @@
       }
       requestAnimationFrame(tick);
     }
-
     return el('div', { class: 'fake-ad-body is-runner' }, [
       stage,
       el('p', { class: 'fake-ad-title fake-ad-neon', text: R.level }),
@@ -159,8 +142,6 @@
       el('p', { class: 'fake-ad-foot', text: R.installs })
     ]);
   }
-
-  // 一道門：左右兩扇半透明的色板＋白色大字，畫在原點，由 .fa-gates 整道移動、放大
   function gateRow(labels) {
     const colors = [['#39d353', '#1d8a2f'], ['#3a8bff', '#1f55b8']];
     return labels.slice(0, 2).map((label, i) => {
@@ -170,8 +151,6 @@
         <text x="${cx}" y="8" text-anchor="middle">${label.replace(/[<&>]/g, '')}</text></g>`;
     }).join('');
   }
-
-  // 圓環：12 個方塊，每個是正面＋頂面＋側面三塊色片拼出來的假 3D，中間空著
   function ringCubes() {
     let out = '';
     for (let i = 0; i < 12; i++) {
@@ -185,8 +164,6 @@
     }
     return out;
   }
-
-  // 小人：n 個顏色亂配的膠囊，每排最多 5 個、排在原點附近（由 .fa-crowd 整群移動），跑步時上下晃
   function men(n) {
     const colors = ['#ff4d4d', '#ffb000', '#3ad15a', '#2f8cff', '#ff5ec4', '#00c2c7', '#ff7a00', '#7d5cff', '#ffe600'];
     let out = '';
@@ -199,8 +176,6 @@
     }
     return out;
   }
-
-  // ---- 阿嬤：手遊廣告那種半寫實 3D 的可憐畫面（Gemini 生成的原創圖），字幕疊在圖片下緣。點哪個都直接 404，沒有別的畫面 ----
   function granny(G) {
     const stage = el('div', { class: 'fake-ad-stage fake-ad-granny' }, [
       el('img', { src: G.image, alt: G.alt }),

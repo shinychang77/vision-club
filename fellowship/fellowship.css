@@ -1,18 +1,12 @@
-/* 教團網站：2026-11-21 改成「燭光聚會」風格（範例見 dev/cult-styles.html 的 2）。只有被邀請的人進得來，像地下室的聚會。
-   設定上是研究中心的人偷偷架在中心網址底下的，所以版面是研究中心網站的翻版（頁首、導覽列、主視覺、頁尾），換成燭光的顏色：
-   暖黑底、燭火的橘光、泛黃的照片。整頁蓋一層暗，只有滑鼠周圍一圈是亮的（.fs-dark，位置由 fellowship.js 更新）。
-   眼疾效果的樣式沿用 ../site.css，疊在燭光上面 */
-:root { color-scheme: only dark; } /* 頁面本來就是暗的：宣告成深色，瀏覽器的強制深色就不會再動它，捲軸也是深色 */
-:root:has(body.fs-missing) { color-scheme: only light; } /* 沒暗號時偽裝成白底的「找不到頁面」，捲軸也要是淺色 */
+:root { color-scheme: only dark; }
+:root:has(body.fs-missing) { color-scheme: only light; }
 body.fellowship {
   --fs-ink: #e9dcc4; --fs-muted: #b39d7a; --fs-gold: #f1c27d; --fs-amber: #e0a85c; --fs-line: #4a3826;
   margin: 0; background: #120c08; color: var(--fs-ink);
   font-family: "Noto Serif TC", "PMingLiU", "MingLiU", serif; font-size: 17px; line-height: 2;
 }
-/* 頁面最上方的燭火光暈 */
 body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 520px; background: radial-gradient(ellipse 60% 100% at 50% 0, rgba(255, 170, 80, .2), transparent 70%); pointer-events: none; }
 .fs-bar { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
-/* 頁首：和研究中心一樣，記號＋名稱在左，回研究中心、找人在右 */
 .fs-header { position: relative; border-bottom: 1px solid var(--fs-line); background: rgba(18, 12, 8, .7); }
 .fs-header .fs-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-top: 14px; padding-bottom: 14px; }
 .fs-name { display: inline-flex; align-items: center; gap: 10px; color: var(--fs-gold); font-size: 20px; font-weight: 700; letter-spacing: .2em; text-decoration: none; }
@@ -26,12 +20,10 @@ body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; righ
 .fs-foot { position: relative; border-top: 1px solid var(--fs-line); color: var(--fs-muted); font-size: 13px; }
 .fs-foot .fs-bar { padding-top: 22px; padding-bottom: 36px; }
 .fs-wrap { position: relative; max-width: 1040px; margin: 0 auto; padding: 40px 24px 80px; }
-/* 主視覺：左邊名稱、經文，右邊聚會的房間（研究中心首頁的位置放的是色塊） */
 .fs-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 36px; align-items: center; padding: 40px; border: 1px solid var(--fs-line); border-radius: 24px; background: rgba(224, 168, 92, .05); }
 .fs-hero .fs-figures { margin: 0; }
 .fs-section { max-width: 800px; margin-left: auto; margin-right: auto; }
-/* 文件頁、使者專區：內文欄不要太寬；印出來的紙置中 */
-.fs-wrap > h1, .fs-wrap > .txt, .fs-wrap > form, .fs-wrap > .fs-footer, .fs-wrap > .fs-figures, .fs-wrap > .fs-table-wrap, .fs-wrap > .fs-kicker { max-width: 800px; margin-left: auto; margin-right: auto; } /* 內文欄置中 */
+.fs-wrap > h1, .fs-wrap > .txt, .fs-wrap > form, .fs-wrap > .fs-footer, .fs-wrap > .fs-figures, .fs-wrap > .fs-table-wrap, .fs-wrap > .fs-kicker { max-width: 800px; margin-left: auto; margin-right: auto; }
 .fs-wrap > .fs-paper { max-width: 700px; margin: 0 auto; }
 .fs-wrap > .fs-paper + .fs-footer { max-width: 700px; margin-left: auto; margin-right: auto; }
 @media (max-width: 760px) { .fs-hero { grid-template-columns: 1fr; padding: 24px; } .fs-nav a:last-child { margin-left: 0; } }
@@ -41,7 +33,6 @@ body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; righ
 .fs-wrap .fs-paper h2::before { display: none; }
 .fs-wrap p { margin: 0 0 12px; }
 .fs-kicker { color: var(--fs-muted); font-size: 14px; letter-spacing: .3em; }
-/* 記號用 mask 套上燭光色 */
 .fs-kicker::before, .fs-paper::before {
   content: ""; display: block; width: 56px; height: 56px; margin-bottom: 12px; background: var(--fs-amber);
   -webkit-mask: url(../assets/fellowship/mark.svg) center / contain no-repeat; mask: url(../assets/fellowship/mark.svg) center / contain no-repeat;
@@ -54,10 +45,8 @@ body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; righ
 .fs-search button { padding: 8px 20px; border: 1px solid var(--fs-amber); background: transparent; color: var(--fs-amber); font: inherit; cursor: pointer; }
 .fs-search button:hover { background: rgba(224, 168, 92, .15); }
 .fs-status { margin: 12px 0 0; }
-/* 搜尋結果頁 */
 .fs-wrap > .fs-results { max-width: 800px; margin: 20px auto 0; padding: 0; list-style: none; }
 .fs-results li { padding: 12px 0; border-bottom: 1px solid var(--fs-line); }
-/* 人物頁：像社群網站的個人頁 */
 .fs-person { max-width: 560px; margin: 0 auto; text-align: center; }
 .fs-avatar { display: block; width: 120px; height: 120px; margin: 8px auto 16px; border: 2px solid var(--fs-line); border-radius: 50%; object-fit: cover; filter: sepia(.3); }
 .fs-presence { color: var(--fs-muted); font-size: 14px; }
@@ -71,24 +60,20 @@ body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; righ
 .fs-bio { margin: 24px 0; padding: 20px 24px; border: 1px solid var(--fs-line); border-radius: 12px; background: rgba(224, 168, 92, .04); }
 .fs-status { min-height: 2em; color: #e2735a; }
 .fs-wrap a, .fs-top a { color: var(--fs-amber); }
-/* 找人：頁首右邊 */
 .fs-top { width: 280px; margin-left: auto; text-align: right; font-size: 15px; line-height: 1.6; }
 .fs-top .fs-search div { max-width: none; }
 .fs-top .fs-search input, .fs-top .fs-search button { padding: 6px 12px; }
 @media (max-width: 760px) { .fs-top { width: 100%; } }
-/* 回研究中心的連結：名稱旁邊。還沒進得來時（找不到頁面）是空的，不顯示 */
 .fs-back { padding: 2px 12px; border: 1px solid var(--fs-line); border-radius: 999px; color: var(--fs-muted); font-size: 13px; text-decoration: none; }
 .fs-back:hover { text-decoration: underline; }
 .fs-back:empty { display: none; }
-/* 照片：泛黃、偏暗。一張就單獨放，多張排成一列 */
 .fs-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin: 20px 0 8px; }
 .fs-figures:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
 .fs-figures:has(> :only-child) img { width: auto; max-width: 100%; max-height: 480px; margin: 0 auto; }
-.fs-figures:has(> :only-child) figcaption { text-align: center; } /* 只有一張圖時圖和圖說置中 */
+.fs-figures:has(> :only-child) figcaption { text-align: center; }
 .fs-figures figure { margin: 0; }
 .fs-figures img { display: block; width: 100%; height: auto; filter: sepia(.5) brightness(.78) contrast(1.1); }
 .fs-figures figcaption { margin-top: 4px; color: var(--fs-muted); font-size: 13px; line-height: 1.6; }
-/* 印出來發的文件：在燭光下攤開的一張紙，微微歪掉，最上面印著記號 */
 .fs-paper { padding: 40px 36px 32px; background: #efe3c9; color: #3a2e22; box-shadow: 0 18px 50px rgba(0, 0, 0, .7); }
 .fs-paper::before { width: 44px; height: 44px; margin: 0 auto 8px; background: #6b5a34; }
 .fs-paper a { color: #6b3a1f; }
@@ -98,10 +83,8 @@ body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; righ
 .fs-paper .fs-table th { color: #7a6a4c; }
 .fs-paper .fs-table th, .fs-paper .fs-table td { border-color: #c9b88f; }
 .fs-table-wrap { overflow-x: auto; margin: 16px 0; }
-/* 使者專區 */
 .fs-zone-link { margin: 20px 0 0; font-size: 15px; letter-spacing: .1em; }
 .fs-zone-end { height: 1px; margin-top: 70vh; }
-/* 捲到最底下：畫面慢慢變黑，問句晚一點才浮出來 */
 .fs-call { position: fixed; inset: 0; z-index: 2147483600; display: grid; place-items: center; background: #000; opacity: 0; transition: opacity 3s ease-in; font: 17px/2 "Noto Serif TC", "PMingLiU", serif; }
 .fs-call.is-on { opacity: 1; }
 .fs-call-box { padding: 24px 32px; border: 1px solid #3a3a3a; background: #0b0b0b; color: #d8d4cc; text-align: center; opacity: 0; transition: opacity 1.2s 3s; }
@@ -113,23 +96,17 @@ body.fellowship::before { content: ""; position: absolute; top: 0; left: 0; righ
 .fs-table { width: 100%; border-collapse: collapse; font-size: 16px; line-height: 1.6; }
 .fs-table th, .fs-table td { padding: 8px 12px; border-bottom: 1px solid var(--fs-line); text-align: left; }
 .fs-table th { color: var(--fs-muted); font-weight: 400; font-size: 14px; letter-spacing: .1em; }
-
-/* 燭光：整頁蓋一層暗，只有滑鼠（或鍵盤焦點）周圍一圈是亮的。在眼疾效果和使者專區的黑幕下面 */
 .fs-dark {
   position: fixed; inset: 0; z-index: 10; pointer-events: none;
   background: radial-gradient(circle 340px at var(--mx, 50%) var(--my, 32%), transparent 0, rgba(8, 5, 3, .2) 50%, rgba(8, 5, 3, .84) 100%);
 }
-/* 從研究中心的墨滴過來：一開始整片暗紅，慢慢退成燭光 */
 .fs-arrive { position: fixed; inset: 0; z-index: 11; pointer-events: none; background: #4a0d10; animation: fs-arrive 2.4s ease-out forwards; }
 @keyframes fs-arrive { to { opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) { .fs-arrive { animation-duration: .01s; } }
-/* 還沒進得來時偽裝成普通的找不到頁面：白底、黑體，沒有燭光 */
 body.fellowship.fs-missing { background: #fff; color: #333; font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
 body.fellowship.fs-missing::before, body.fellowship.fs-missing .fs-header, body.fellowship.fs-missing .fs-nav, body.fellowship.fs-missing .fs-foot { display: none; }
 body.fellowship.fs-missing .fs-wrap { max-width: 640px; padding-top: 72px; }
 body.fellowship.fs-missing .fs-wrap h1 { color: #333; text-shadow: none; }
-
-/* ---- 首頁：聚會告示牆（fellowship.js 的 renderHome）---- */
 .fs-hero .fs-kicker { margin: 0 0 4px; }
 .fs-hero .fs-kicker::before { width: 40px; height: 40px; margin-bottom: 8px; }
 .fs-count-label { margin: 0; color: var(--fs-muted); font-size: 14px; letter-spacing: .1em; }
@@ -142,18 +119,15 @@ body.fellowship.fs-missing .fs-wrap h1 { color: #333; text-shadow: none; }
 .fs-rsvp:hover { background: rgba(224, 168, 92, .12); }
 .fs-rsvp:disabled { border-color: #e2735a; color: #e2735a; cursor: default; }
 .fs-hero img { border-radius: 14px; }
-/* 跑馬燈：誰剛做了什麼 */
 .fs-ticker { overflow: hidden; margin: 22px 0 0; border-top: 1px solid var(--fs-line); border-bottom: 1px solid var(--fs-line); color: var(--fs-muted); font-size: 14px; white-space: nowrap; }
 .fs-ticker > div { display: inline-block; padding: 8px 0; will-change: transform; }
 .fs-ticker span { display: inline-block; padding-right: 48px; }
 .fs-ticker span::before { content: "● "; color: var(--fs-amber); }
-/* 這一週的行事曆 */
 .fs-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; text-align: center; font-size: 13px; line-height: 1.6; }
 .fs-week li { padding: 10px 4px; border: 1px solid var(--fs-line); border-radius: 10px; color: var(--fs-muted); }
 .fs-week b { display: block; font-weight: 400; }
 .fs-week li.is-on { border-color: var(--fs-amber); color: var(--fs-ink); }
 .fs-week li.is-on b { color: var(--fs-gold); font-weight: 700; }
-/* 團契裡的地方：一排上鎖的入口 */
 .fs-areas h2 { margin: 36px 0 12px; }
 .fs-areas ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
 .fs-areas a { position: relative; display: block; height: 100%; padding: 14px 16px 14px 40px; border: 1px solid var(--fs-line); border-radius: 12px; background: rgba(224, 168, 92, .04); color: var(--fs-ink); line-height: 1.6; }
@@ -163,15 +137,12 @@ body.fellowship.fs-missing .fs-wrap h1 { color: #333; text-shadow: none; }
 .fs-areas b { display: block; color: var(--fs-gold); font-weight: 600; }
 .fs-areas span { display: block; font-size: 13px; }
 .fs-areas small { display: block; margin-top: 4px; color: var(--fs-amber); font-size: 12px; }
-/* 進不去的地方：一扇關著的門 */
 .fs-locked { max-width: 560px; margin: 24px 0; padding: 28px 32px; border: 1px solid var(--fs-line); border-left: 3px solid #e2735a; background: rgba(226, 115, 90, .05); }
 .fs-locked-title { margin: 0 0 8px; color: #e2735a; letter-spacing: .1em; }
 .fs-locked .txt { margin: 0; color: var(--fs-ink); }
 .fs-wrap > .fs-locked { max-width: 560px; }
-/* 團契裡的地方（受邀者進不去）：整頁置中，提示框的色條改放上面 */
 .fs-area { text-align: center; }
 .fs-area .fs-locked { margin: 24px auto; border-left-width: 1px; border-top: 3px solid #e2735a; }
-/* 牆上的紙條：手寫字、微微歪掉 */
 .fs-wall { columns: 3 240px; column-gap: 18px; margin-top: 28px; }
 .fs-note { break-inside: avoid; margin-bottom: 18px; padding: 16px 18px; background: #efe0c2; color: #3a2b1d; font: 16px/1.7 "LXGW WenKai TC", "Klee One", "Noto Serif TC", serif; box-shadow: 0 10px 24px rgba(0, 0, 0, .5); }
 .fs-note:nth-child(3n+1) { transform: rotate(-1.2deg); }
@@ -181,6 +152,5 @@ body.fellowship.fs-missing .fs-wrap h1 { color: #333; text-shadow: none; }
 .fs-note small { display: block; margin-top: 6px; color: #7a6248; font-size: 13px; }
 .fs-note img { display: block; width: 100%; height: auto; margin-bottom: 8px; filter: sepia(.4); }
 .fs-note.is-red { color: #8a1f1a; }
-/* 壓在下面的紙條：只露出右下角一點，上面那張被碰到時往左掀開 */
 .fs-wall + .fs-verse { margin-top: 32px; text-align: center; border-left: 0; background: none; color: var(--fs-muted); font-style: italic; }
 @media (max-width: 760px) { .fs-week { grid-template-columns: repeat(4, 1fr); } }

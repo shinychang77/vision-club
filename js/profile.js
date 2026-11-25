@@ -1,4 +1,3 @@
-// 個人資料頁：暱稱、年齡
 (function () {
   const C = window.EYE_CONTENT;
   const P = window.EyeProgress;
@@ -7,17 +6,14 @@
   const app = document.getElementById('profile-app');
   if (!C || !P || !app) return;
   const T = C.profile;
-
   document.getElementById('page-title').textContent = T.title;
   document.getElementById('page-intro').textContent = T.intro;
-
   const nickname = el('input', { type: 'text', id: 'nickname', name: 'nickname', maxlength: 20, required: true, autocomplete: 'nickname', 'aria-describedby': 'nickname-hint' });
   const age = el('input', { type: 'number', id: 'age', name: 'age', min: 0, max: 120, step: 1, required: true, inputmode: 'numeric', 'aria-describedby': 'age-hint' });
   const ageWarn = el('p', { class: 'red-text field-warn', role: 'status' });
   const saveStatus = el('p', { class: 'form-status', role: 'status' });
   const subjectId = el('dd', { 'data-field': 'subjectId' });
   const answered = el('dd', { 'data-field': 'answered' });
-
   const form = el('form', { class: 'panel profile-form', novalidate: true }, [
     el('div', { class: 'field' }, [
       el('label', { for: 'nickname', text: T.nicknameLabel }), nickname,
@@ -31,14 +27,11 @@
     el('button', { type: 'submit', class: 'button button-small', text: T.saveButton }),
     saveStatus
   ]);
-
-  // 年齡偏小時的紅字提示：只提示，不擋儲存
   function showAgeWarn() {
     const n = age.value.trim() === '' ? NaN : Number(age.value);
     ageWarn.textContent = n >= 0 && n <= T.ageWarnUpTo ? T.ageWarn : '';
   }
   age.addEventListener('input', showAgeWarn);
-
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!nickname.value.trim() || !age.value.trim()) {
@@ -56,11 +49,9 @@
     age.removeAttribute('aria-invalid');
     saveStatus.textContent = T.saved;
     fill();
-    // 從測驗頁被請過來補資料的，存好就回去作答（解鎖提示到測驗頁再跳）
     if (location.search === '?next=quiz') { location.href = 'quiz.html'; return; }
-    if (window.EyeEffects) window.EyeEffects.refresh(); // 年齡填到幼兒會解鎖一題：按「儲存」後才跳提示
+    if (window.EyeEffects) window.EyeEffects.refresh();
   });
-
   app.replaceChildren(
     form,
     el('dl', { class: 'stats profile-stats' }, [
@@ -68,8 +59,6 @@
       el('div', {}, [el('dt', { text: T.answeredLabel }), answered])
     ])
   );
-
-  // 只讀不寫：打開這一頁本身不會產生任何紀錄
   function fill() {
     const p = P.load();
     nickname.value = p.profile.nickname;

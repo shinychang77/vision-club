@@ -1,5 +1,3 @@
-// 研究單位網站：首頁、公開頁面、員工專區。內容見 content.js 的 lab
-// 網址：index.html 是首頁，#staff 是員工專區（登入在這裡）。研究筆記放在遠端影像系統（sem.html）的儀器旁邊
 (function () {
   'use strict';
   const C = window.EYE_CONTENT;
@@ -17,27 +15,21 @@
   const D = L.dim;
   const CH = L.chat;
   const PT = L.portal;
-
   document.title = L.unitName;
   document.getElementById('lab-name').textContent = L.unitName;
   document.getElementById('lab-back').textContent = L.backToMain;
-  // ---- 深色模式：玩家把裝置切成深色模式、而且已經登入時，首頁整個變黑，中間浮現一行平常看不到的字 ----
-  // 黑幕擋住整頁，點一下才收起來；離開首頁再回來、或重新切成深色模式，就會再出現一次。
-  // 本來就開深色模式的玩家不會卡住，但每次回首頁都要再點一次，不會一直開著深色模式玩、把眼疾效果看淡
-  // 網頁讀不到螢幕亮度，但讀得到系統是不是深色模式。對應世界觀「光是眼睛的食物」
   const glow = el('p', { class: 'lab-glow', 'aria-live': 'polite' });
   const dark = window.matchMedia('(prefers-color-scheme: dark)');
-  let dismissed = false; // 這一次待在首頁時點掉了
+  let dismissed = false;
   function applyDim() {
-    const home = location.hash.length < 2; // 只有首頁有字
-    if (!home) dismissed = false;           // 離開首頁就重來，回首頁會再出現
+    const home = location.hash.length < 2;
+    if (!home) dismissed = false;
     const show = dark.matches && !!member() && home && !dismissed;
-    glow.textContent = show ? D.text : '';  // 平常不放進頁面，全選或搜尋都找不到
+    glow.textContent = show ? D.text : '';
     glow.classList.toggle('is-shown', show);
   }
   glow.addEventListener('click', () => { dismissed = true; applyDim(); });
   dark.addEventListener('change', () => { dismissed = false; applyDim(); showSky(); });
-  // 標誌旁的太陽／月亮：只顯示網頁讀到的是淺色還是深色，不能按。玩家切了系統設定、瀏覽器卻沒跟上時，看得出網站沒收到
   const sky = document.getElementById('lab-sky');
   function showSky() {
     sky.innerHTML = dark.matches
@@ -45,24 +37,20 @@
       : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
   }
   if (sky) showSky();
-  document.documentElement.append(glow); // 掛在 <body> 外面：眼疾效果會在 body 加濾鏡，裡面的 fixed 元素就不會貼著螢幕了
+  document.documentElement.append(glow);
   document.getElementById('lab-footer').replaceChildren(el('p', { text: H.footer }), H.phone ? el('p', { text: H.phone }) : '');
-
   const member = () => L.members.find((m) => m.id === P.load().lab.user) || null;
-
   function route() {
     const file = L.files.find((x) => location.hash === '#file-' + x.id);
     const page = L.pages.find((x) => location.hash === '#' + x.id);
     const doc = L.docs.find((x) => location.hash === '#doc-' + x.id);
-    const inside = /^#(staff|chat|file-|doc-|search=)/.test(location.hash); // 員工專區裡面的頁面
+    const inside = /^#(staff|chat|file-|doc-|search=)/.test(location.hash);
     renderNav(page, inside);
-    document.getElementById('lab-search').replaceChildren(renderSearch()); // 搜尋框固定在頁首右上角，每一頁都有
-    main.replaceChildren(...[inside && member() ? portalBar() : null, ...(file ? renderFile(file) : doc ? renderDoc(doc) : page ? renderPage(page) : location.hash.startsWith('#search=') ? renderResults(decodeURIComponent(location.hash.slice(8))) : location.hash.startsWith('#chat') ? renderChat() : location.hash === '#staff' ? renderStaff() : renderHome())].filter(Boolean)); // 沒有照片的地方會有空項目，要濾掉
+    document.getElementById('lab-search').replaceChildren(renderSearch());
+    main.replaceChildren(...[inside && member() ? portalBar() : null, ...(file ? renderFile(file) : doc ? renderDoc(doc) : page ? renderPage(page) : location.hash.startsWith('#search=') ? renderResults(decodeURIComponent(location.hash.slice(8))) : location.hash.startsWith('#chat') ? renderChat() : location.hash === '#staff' ? renderStaff() : renderHome())].filter(Boolean));
     applyDim();
     window.scrollTo(0, 0);
   }
-
-  // 頁首下方的導覽列：首頁與公開頁面（content.js 的 lab.pages）
   function renderNav(current, inside) {
     const home = location.hash.length < 2;
     document.getElementById('lab-nav').replaceChildren(
@@ -71,21 +59,15 @@
       el('a', { href: '#staff', class: 'lab-nav-staff', 'aria-current': inside ? 'page' : null, text: L.nav.staff })
     );
   }
-
-  // 內部文件：登入後用搜尋框才找得到
   function renderDoc(doc) {
     const home = el('p', {}, el('a', { href: '#staff', text: T.toStaff }));
     if (!member()) return [el('p', { text: T.needLogin }), home];
-    // 有 code 的文件要輸入密碼才看得到內文（打開後記下事件 doc.event）
-    if (doc.code && !lib.hasEvent(P.load(), doc.event)) return [el('h1', { text: doc.title }), lockForm(doc), home];
-    // stamp（選填）：蓋在標題下面的印章，例如「不予刊出」
+    if ((doc.code || doc.codeCheck) && !lib.isOpen(P.load(), doc)) return [el('h1', { text: doc.title }), lockForm(doc), home];
     return [el('h1', { text: doc.title }), doc.stamp ? el('p', { class: 'lab-stamp', text: doc.stamp }) : null, ...doc.blocks.flatMap(renderBlock), home];
   }
-
   function renderPage(page) {
     return [el('h1', { text: page.title }), ...page.blocks.flatMap(renderBlock)];
   }
-
   function renderBlock(block) {
     switch (block.type) {
       case 'h': return el('h2', { text: block.text });
@@ -96,16 +78,13 @@
         el('tbody', {}, block.rows.map((row) => el('tr', {}, row.map((text) => el('td', { text })))))
       ]));
       case 'img': return figure(block);
-      case 'file': { // 連到加密文件（lab.files）
+      case 'file': {
         const file = L.files.find((x) => x.id === block.id);
         return el('p', { class: 'lab-file-link' }, el('a', { href: '#file-' + file.id, text: file.title }));
       }
       default: return null;
     }
   }
-
-  // 照片：點了開原圖。src 是相對於 lab/ 的路徑
-  // overlay（選填）是疊在圖上的幾行字，第一行最大。用在封面：圖片留白，書名和期數由網頁疊上去
   function figure(photo) {
     return el('figure', { class: 'lab-figure' + (photo.overlay ? ' lab-cover' : '') }, [
       el('a', { href: photo.src, target: '_blank', rel: 'noopener' }, [
@@ -115,8 +94,6 @@
       photo.caption ? el('figcaption', { text: photo.caption }) : null
     ]);
   }
-
-  // 首頁：主視覺（標語＋介紹＋按鈕，右邊是和標誌同一個圖形的色塊）→ 研究資源卡片 → 最新消息＋員工專區
   function renderHome() {
     return [
       el('section', { class: 'lab-hero' }, [
@@ -130,7 +107,6 @@
       ]),
       H.photo ? figure(H.photo) : null,
       el('h2', { text: H.equipmentTitle }),
-      // equipment 每一項的 cells 依序是：名稱、來源、說明
       el('ul', { class: 'lab-cards' }, H.equipment.map(({ cells: [name, from, note] }) => el('li', {}, [
         el('h3', { text: name }), el('small', { text: from }), el('p', { text: note })
       ]))),
@@ -141,8 +117,6 @@
       ])))
     ];
   }
-
-  // 員工專區最上面的系統列：系統名稱、登入的人、登出
   function portalBar() {
     const who = member();
     return el('div', { class: 'lab-portal-bar' }, [
@@ -151,8 +125,6 @@
       el('button', { type: 'button', onclick: () => { P.labLogout(); location.hash = '#staff'; route(); }, text: T.logout })
     ]);
   }
-
-  // 員工專區（#staff）：登入前是登入頁，登入後是入口網首頁（左邊是遠端影像系統、訊息、加密文件的入口，右邊是系統公告）
   function renderStaff() {
     const who = member();
     if (!who) return [renderLogin()];
@@ -177,8 +149,6 @@
       ])
     ])];
   }
-
-  // 登入頁
   function renderLogin() {
     const name = el('input', { type: 'text', id: 'lab-login-name', autocomplete: 'off', spellcheck: 'false' });
     const staffId = el('input', { type: 'text', id: 'lab-login-id', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
@@ -203,8 +173,6 @@
     });
     return form;
   }
-
-  // 站內搜尋：要先登入才能用，登入後底字是暗號的格式提示（S.codeHint）。平常什麼都查不到；輸入暗號（深色模式才看得到）就進教團網站，並記下事件
   function renderSearch() {
     const locked = !member();
     const input = el('input', { type: 'search', id: 'lab-q', autocomplete: 'off', placeholder: locked ? S.label : S.codeHint, 'aria-label': S.label, disabled: locked });
@@ -219,13 +187,10 @@
       if (locked) return;
       const q = input.value.trim();
       if (P.openLock(S, q).ok) { input.disabled = true; crossToCult(input, q); return; }
-      // 不是暗號：到搜尋結果頁
       if (q) location.hash = '#search=' + encodeURIComponent(q);
     });
     return form;
   }
-
-  // 搜尋結果頁（#search=關鍵字）：內部文件（關鍵字要完全打對）和外部連結（search.links），點了開新分頁
   function renderResults(q) {
     const home = el('p', {}, el('a', { href: '#staff', text: T.toStaff }));
     if (!member()) return [el('p', { text: T.needLogin }), home];
@@ -243,15 +208,10 @@
       home
     ];
   }
-
-  // ---- 輸入暗號後的過場（範例見 dev/cult-styles.html 的 D＋E）----
-  // 研究中心的字一個個沉下去、糊掉，只剩暗號；暗號變紅，一滴暗紅色從搜尋框暈開吞掉整個畫面，才跳到教團。
-  // 教團那邊接著從同一個暗紅色退成燭光（fellowship.js 讀 sessionStorage 的 eye:cross）
   function crossToCult(from, code) {
     const go = () => { location.href = S.href; };
-    try { sessionStorage.setItem('eye:cross', '1'); } catch (e) { /* 讀寫不了就沒有接續的動畫 */ }
+    try { sessionStorage.setItem('eye:cross', '1'); } catch (e) {   }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { go(); return; }
-    // 字散：把頁面上的字拆成一個一個，每個字晚一點點、歪一點點往下沉
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => (n.nodeValue.trim() && !n.parentElement.closest('script, style') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT)
     });
@@ -265,7 +225,6 @@
       return s;
     })));
     document.body.classList.add('lab-crossing');
-    // 暗號和墨滴掛在 <body> 外面，不受眼疾效果的濾鏡影響
     const r = from.getBoundingClientRect();
     const layer = el('div', { class: 'lab-cross', 'aria-hidden': 'true' }, [
       el('p', { class: 'lab-cross-code', text: code }),
@@ -277,9 +236,6 @@
     document.documentElement.append(layer);
     setTimeout(go, 4700);
   }
-
-  // 訊息（#chat、#chat-對象 id）：左邊是聊天對象，右邊是對話和輸入欄。帳號是唯讀的，送不出去。
-  // 打開過的對象不再算未讀（記在進度的 ui.read，換頁、重新整理都一樣）
   const isRead = (id) => P.load().ui.read.indexOf(id) !== -1;
   function renderChat() {
     const home = el('p', {}, el('a', { href: '#staff', text: T.toStaff }));
@@ -306,7 +262,6 @@
         el('section', { class: 'lab-thread' }, [
         el('header', { class: 'lab-thread-head' }, [el('b', { text: t.name }), el('span', { class: 'lab-tag', text: t.tag })]),
         el('ol', { class: 'lab-chat' }, t.messages.map((m) => {
-          // 左右對話：對方在左邊（有頭像），自己在右邊
           return el('li', { class: m.me ? 'is-me' : null }, [
             m.me ? null : avatar(t.name),
             el('p', { class: 'lab-bubble', text: m.text }),
@@ -320,21 +275,16 @@
       home
     ];
   }
-
-  // 加密文件：密碼的提示是一行點字，解開後記下事件（content.js 的 lab.files）。底下的連結回到掛著它的內部文件
   function renderFile(file) {
     const from = L.docs.find((d) => d.blocks.some((b) => b.type === 'file' && b.id === file.id));
     const home = el('p', {}, from ? el('a', { href: '#doc-' + from.id, text: from.title }) : el('a', { href: '#staff', text: T.toStaff }));
     if (!member()) return [el('p', { text: T.needLogin }), home];
-    if (lib.hasEvent(P.load(), file.event)) {
+    if (lib.isOpen(P.load(), file)) {
       const body = window.EyeDom.paras(file.paragraphs);
       return [el('h1', { text: file.title }), file.big ? el('div', { class: 'lab-maxim' }, body) : body, home].flat();
     }
     return [el('h1', { text: file.title }), lockForm(file), home];
   }
-
-  // 上鎖的表單：加密文件（lab.files）和上了鎖的內部文件（lab.docs）共用。
-  // item 是 { code 密碼, event 打開後記下的事件, hint 提示（選填）, hintBraille 點字提示（選填） }
   function lockForm(item) {
     const code = el('input', { type: 'text', id: 'lab-file-code', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
     const status = el('p', { class: 'lab-status', role: 'status' });
@@ -349,12 +299,11 @@
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       if (!P.openLock(item, code.value).ok) { status.textContent = F.wrong; return; }
-      if (window.EyeEffects) window.EyeEffects.refresh(); // 解開文件帶來的眼疾效果，馬上套用
+      if (window.EyeEffects) window.EyeEffects.refresh();
       route();
     });
     return form;
   }
-
   window.addEventListener('hashchange', route);
   route();
 })();
