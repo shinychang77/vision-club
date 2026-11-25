@@ -21,8 +21,8 @@
   const link = (entry) => el('a', { href: entry.href || '#' + entry.id, target: '_blank', rel: 'noopener', text: entry.title });
 
   // 詞條（知覺、演化這類科普，之後每條都有清晰度滑桿的示意圖）放「知識庫」；新聞和搜得到的連結是主線，放「搜尋歷史」。
-  // 搜「新聞」會一次找到三則新聞（它們的 keywords 都有「新聞」）
-  const isExtra = (entry) => !entry.href && entry.category !== '新聞';
+  // 搜「新聞」會一次找到兩則新聞（它們的 keywords 都有「新聞」）；研究中心的得獎公告只有搜本名才找得到
+  const isExtra = (entry) => !entry.href && entry.category !== '新聞' && entry.category !== '公告';
   const foundEntries = () => P.load().wiki.found.map((id) => W.entries.find((e) => e.id === id)).filter(Boolean);
 
   // 搜尋歷史：主線找到的文件和連結，最新的在上面
