@@ -7,16 +7,16 @@
   const go = () => { location.href = '404.html'; };
   setTimeout(() => {
     const kind = Math.random() < 0.5 ? 'runner' : 'granny';
-    const box = el('aside', { class: 'fake-ad', 'aria-label': A.label }, [
-      el('div', { class: 'fake-ad-bar' }, [
+    const box = el('aside', { class: 'mini-game', 'aria-label': A.label }, [
+      el('div', { class: 'mini-game-bar' }, [
         el('span', { text: A.label }),
-        el('button', { type: 'button', class: 'fake-ad-x', 'aria-label': A.close, text: '✕', onclick: () => { box.remove(); shade.remove(); } })
+        el('button', { type: 'button', class: 'mini-game-x', 'aria-label': A.close, text: '✕', onclick: () => { box.remove(); shade.remove(); } })
       ]),
       kind === 'runner' ? runner(A.runner) : granny(A.granny)
     ]);
-    const shade = el('div', { class: 'fake-ad-shade', onclick: () => { box.remove(); shade.remove(); } });
+    const shade = el('div', { class: 'mini-game-shade', onclick: () => { box.remove(); shade.remove(); } });
     box.addEventListener('click', (event) => {
-      if (box.classList.contains('is-big') || event.target.closest('.fake-ad-x')) return;
+      if (box.classList.contains('is-big') || event.target.closest('.mini-game-x')) return;
       event.stopPropagation();
       event.preventDefault();
       const r = box.getBoundingClientRect();
@@ -29,7 +29,7 @@
   }, A.delay);
   const MAX_MEN = 20;
   function runner(R) {
-    const stage = el('div', { class: 'fake-ad-stage fake-ad-runner' });
+    const stage = el('div', { class: 'mini-game-stage mini-game-runner' });
     stage.innerHTML = `<svg viewBox="0 0 280 210" aria-hidden="true">
       <defs>
         <linearGradient id="fa-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fd0ff"/><stop offset="1" stop-color="#c9f1ff"/></linearGradient>
@@ -48,7 +48,7 @@
     const crowdG = stage.querySelector('.fa-crowd');
     const menG = crowdG.querySelector('.fa-men');
     const countT = crowdG.querySelector('.fa-count');
-    const hand = el('span', { class: 'fake-ad-hand', 'aria-hidden': 'true', text: '👆' });
+    const hand = el('span', { class: 'mini-game-hand', 'aria-hidden': 'true', text: '👆' });
     const op = (g) => {
       const n = Number(g.replace(/[^\d]/g, '')) || 0;
       return g[0] === '×' ? (c) => c * n : /^[−-]/.test(g) ? (c) => c - n : (c) => c + n;
@@ -134,12 +134,12 @@
       }
       requestAnimationFrame(tick);
     }
-    return el('div', { class: 'fake-ad-body is-runner' }, [
+    return el('div', { class: 'mini-game-body is-runner' }, [
       stage,
-      el('p', { class: 'fake-ad-title fake-ad-neon', text: R.level }),
-      el('p', { class: 'fake-ad-hint', text: R.hint }),
+      el('p', { class: 'mini-game-title mini-game-neon', text: R.level }),
+      el('p', { class: 'mini-game-hint', text: R.hint }),
       hand,
-      el('p', { class: 'fake-ad-foot', text: R.installs })
+      el('p', { class: 'mini-game-foot', text: R.installs })
     ]);
   }
   function gateRow(labels) {
@@ -177,15 +177,15 @@
     return out;
   }
   function granny(G) {
-    const stage = el('div', { class: 'fake-ad-stage fake-ad-granny' }, [
+    const stage = el('div', { class: 'mini-game-stage mini-game-granny' }, [
       el('img', { src: G.image, alt: G.alt }),
-      el('p', { class: 'fake-ad-caption' }, [G.title, el('br'), G.question])
+      el('p', { class: 'mini-game-caption' }, [G.title, el('br'), G.question])
     ]);
     stage.addEventListener('click', go);
-    return el('div', { class: 'fake-ad-body' }, [
+    return el('div', { class: 'mini-game-body' }, [
       stage,
-      el('div', { class: 'fake-ad-options' }, G.options.map((text) => el('button', { type: 'button', class: 'fake-ad-btn', text, onclick: go }))),
-      el('p', { class: 'fake-ad-foot', text: G.installs })
+      el('div', { class: 'mini-game-options' }, G.options.map((text) => el('button', { type: 'button', class: 'mini-game-btn', text, onclick: go }))),
+      el('p', { class: 'mini-game-foot', text: G.installs })
     ]);
   }
 })();
