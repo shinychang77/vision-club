@@ -2316,7 +2316,7 @@ var EYE_CONTENT = {
         { id: 'members', keywords: ['名冊', '成員', '朋友'], title: '成員名冊', desc: '每一位朋友們', now: '214 位' }
       ],
       lockedTitle: '受邀者還不能進入',
-      lockedText: '這裡只有朋友■得到。\n參加過一次熄燈聚會，就會有人為你開門。',
+      lockedText: '這裡只有朋友■得到。\n等你準備好了，就會有人為你開門。',
       lockedBack: '回到告示牆',
       weekLabel: '這一週',
       week: [
@@ -2396,7 +2396,7 @@ var EYE_CONTENT = {
       link: '使者專區',
       title: '使者專區',
       keywords: ['使者', '使者專區', '名冊', '使者名冊'],
-      denied: '權限不足。',
+      denied: '還不到時候。',
       event: 'summoned',
       confirm: '是否前往進行測試？',
       yes: '是',
