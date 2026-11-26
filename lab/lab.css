@@ -216,7 +216,7 @@ body.lab-crossing { animation: lab-fade 1.2s 1.8s forwards; }
 .sem-denied { grid-column: 1 / -1; padding: 40px 0; }
 .sem-denied a { color: #9fc0ea; }
 .sem-mark { position: absolute; }
-.sem-frame { position: absolute; inset: 0; border: 2px solid currentColor; }
+.sem-frame { position: absolute; inset: 0; border: 4px solid currentColor; }
 .sem-photo {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse at center, #000 62%, transparent 71%);

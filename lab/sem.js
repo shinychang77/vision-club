@@ -206,7 +206,7 @@
       const o = S.revealOpacity(m.clue, scale);
       m.photo.style.opacity = o;
       m.frame.style.opacity = 1 - o;
-      m.frame.style.borderWidth = 2 / scale + 'px';
+      m.frame.style.borderWidth = 4 / scale + 'px';
     });
     magSlider.value = Math.round(state.t * 1000);
     focusSlider.value = state.focus;
